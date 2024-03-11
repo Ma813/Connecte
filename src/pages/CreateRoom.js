@@ -10,8 +10,8 @@ const GameRoom = () => {
             .then(response => response.json())
             .then(data => {
                 // Set the API data to the state variable
-                setRoomId(data.game_id);
-                navigate(`/room/${data.game_id}`);
+                setRoomId(data.gameId);
+                navigate(`/room/${data.gameId}`);
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
@@ -19,7 +19,7 @@ const GameRoom = () => {
     };
 
     useEffect(() => {
-      if (roomId !== '') {
+    if (roomId !== '') {
         navigate(`/room/${roomId}`);
       }
     }, [roomId]);

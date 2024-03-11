@@ -3,34 +3,34 @@ import random
 
 
 class Connect4:
-    """Play TicTacToe on a h x v board, with Max (first player) playing 'X'.
-    A state has the player to move, a cached utility, a list of moves in
-    the form of a list of (x, y) positions, and a board, in the form of
-    a dict of {(x, y): Player} entries, where Player is 'X' or 'O'."""
-
-    def __init__(self, h=6, w=7, k=3):
+ 
+    def __init__(self, h=6, w=7, k=4,playerCount = 2):
         self.h = h
         self.w = w
         self.k = k
         self.toMove = (-1, -1)
         self.players = []
+        self.playerCount = playerCount
         self.state = 0
         self.board = np.zeros((h, w))
 
-    def getBoard(self):
-        return self.board
+    def getState():
+        return state
+
+    def getBoardString(self):
+        return np.array2string(self.board)
 
     # returns all legal moves
     def legalMoves(self):
-        moves = 0
+        moves = []
         for i in range(self.w):
             if self.board[0][i] == 0:
-                moves += 1
+                moves.append(i)
         return moves
 
     # returns true if draw false others
-    def drawCheck(self):
-        if self.checkForWin() is False and self.legalMoves() == 0:
+    def checkForDraw(self):
+        if self.checkForWin() is False and len(self.legalMoves()) == 0:
             return True
         return False
 
@@ -77,8 +77,15 @@ class Connect4:
     def addPlayer(self, id):
         playerNumber = len(self.players)
         self.players.append((playerNumber + 1, id))
-        if len(self.players) == 2:
+        if len(self.players) == self.playerCount:
+            self.changeState()
             return
+
+    def changeToMove(self):
+        toMoveIndex = self.players.index(self.toMove) + 1
+        if(toMoveIndex == len(self.players)):
+            toMoveIndex = 0
+        self.toMove = self.players[toMoveIndex]
 
     def changeState(self):
         if self.state == 0:
@@ -86,6 +93,7 @@ class Connect4:
             self.toMove = random.choice(self.players)
             return
         if self.state == 1:
-            self.state = 2
-            self.toMove = None
+            self.state = 0
+            self.__init__()
+            self.toMove = (-1, -1)
             return

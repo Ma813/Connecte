@@ -2,7 +2,7 @@ const PathConstants = {
     GAME: "/",
     ABOUT: "about",
     CREATEROOM:"CreateRoom",
-    ROOM:"room/:roomId"
+    ROOM:"room/:gameId"
 }
 
 export default PathConstants
