@@ -12,7 +12,7 @@ class Connect4:
         self.h = h
         self.w = w
         self.k = k
-        self.toMove = [(-1, -1)]
+        self.toMove = (-1, -1)
         self.players = []
         self.state = 0
         self.board = np.zeros((h, w))
@@ -24,10 +24,8 @@ class Connect4:
     def legalMoves(self):
         moves = 0
         for i in range(self.w):
-            for j in range(self.h):
-                if self.board == 0:
-                    moves += 1
-                    break
+            if self.board[0][i] == 0:
+                moves += 1
         return moves
 
     # returns true if draw false others
@@ -46,29 +44,29 @@ class Connect4:
 
     # returns true if there are any k connected tiles on the board otherwise returns false
     def checkForWin(self):
-        for c in range(self.h - 3):
-            for r in range(self.w):
+        for c in range(self.w - 3):
+            for r in range(self.h):
                 if self.board[r][c] == self.toMove[0] and self.board[r][
                     c + 1] == self.toMove[0] and self.board[r][
                     c + 2] == self.toMove[0] and self.board[r][
                     c + 3] == self.toMove[0]:
                     return True
-        for c in range(self.h):
-            for r in range(self.w - 3):
+        for c in range(self.w):
+            for r in range(self.h - 3):
                 if self.board[r][c] == self.toMove[0] and self.board[r + 1][
                     c] == self.toMove[0] and self.board[r + 2][
                     c] == self.toMove[0] and self.board[r + 3][
                     c] == self.toMove[0]:
                     return True
-        for c in range(self.h - 3):
-            for r in range(self.w - 3):
+        for c in range(self.w - 3):
+            for r in range(self.h - 3):
                 if self.board[r][c] == self.toMove[0] and self.board[r + 1][
                     c + 1] == self.toMove[0] and self.board[r + 2][
                     c + 2] == self.toMove[0] and self.board[r + 3][
                     c + 3] == self.toMove[0]:
                     return True
-        for c in range(self.h - 3):
-            for r in range(3, self.w):
+        for c in range(self.w - 3):
+            for r in range(3, self.h):
                 if self.board[r][c] == self.toMove[0] and self.board[r - 1][
                     c + 1] == self.toMove[0] and self.board[r - 2][
                     c + 2] == self.toMove[0] and self.board[r - 3][
