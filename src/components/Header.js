@@ -14,6 +14,9 @@ export default function Header() {
             <li className="nav-item">
               <Link to={PathConstants.ABOUT}>About</Link>
             </li>
+            <li className="nav-item">
+              <Link to={PathConstants.CREATEROOM}>Create Room</Link>
+            </li>
           </ul>
         </nav>
       </div>
