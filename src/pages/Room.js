@@ -11,7 +11,7 @@ const Room = () => {
     const [win,setWin] = useState(false)
     const [draw,setDraw] = useState(false)
     const [gameState, setGameState] = useState('loading');
-    
+    const fullURL = window.location.href;
     useEffect(() => {
         // Establish a WebSocket connection to the server
       
@@ -66,11 +66,22 @@ const Room = () => {
 
   const renderWaitingForOnePlayer = () => (
     <div>
-      <p>Waiting for one more player to join...</p>
+      <p className='message'>Waiting for one more player to join...</p>
+      <p className='message'>Room ID is: <b>{gameId}</b></p>
+      <p className='message'>Invite players with this URL: <b>{fullURL}</b> </p>
+      <button className='copyButton' onClick={copyURL}>Copy URL</button>
+      <button className='copyButton' onClick={copyID}>Copy Room ID</button>
       {/* Add any relevant UI elements */}
     </div>
 
   );
+
+  const copyURL = () => {
+    navigator.clipboard.writeText(fullURL)
+  }
+  const copyID = () => {
+    navigator.clipboard.writeText(gameId)
+  }
 
   const renderPlayingGame = () => (
     <div>
