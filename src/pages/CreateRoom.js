@@ -6,7 +6,7 @@ const GameRoom = () => {
     const navigate = useNavigate();
 
     const createRoom = () => {
-        fetch('/getRoom')
+        fetch('http://'+window.location.hostname+':5000/getRoom')
             .then(response => response.json())
             .then(data => {
                 // Set the API data to the state variable

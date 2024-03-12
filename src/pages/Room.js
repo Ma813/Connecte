@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { createBrowserRouter, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 
 const Room = () => {
@@ -11,9 +11,15 @@ const Room = () => {
     const [win,setWin] = useState(false)
     const [draw,setDraw] = useState(false)
     const [gameState, setGameState] = useState('loading');
+    
     useEffect(() => {
         // Establish a WebSocket connection to the server
-        const newSocket = io('http://localhost:5000'); // Replace with your server address
+      
+        const newSocket = io(window.location.hostname+':5000',{
+
+        });
+        
+        
         setSocket(newSocket);
 
         newSocket.on('connect', () => {

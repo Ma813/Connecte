@@ -5,8 +5,13 @@ import random
 import time
 from Connect4.connect4 import Connect4
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
-socketio = SocketIO(app, cors_allowed_origins="http://localhost:3000")
+cors = CORS(app, resource={
+    r"/*":{
+        "origins":"*"
+    }
+})
+
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Dictionary to store active rooms
 games = {}

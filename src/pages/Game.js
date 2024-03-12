@@ -12,14 +12,14 @@ export default function Game() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: 'React POST Request Example' })
       };
-      fetch('/send', requestOptions)
+      fetch('http://'+window.location.hostname+':5000/send', requestOptions)
       
       }
       
   const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
-    fetch('/time').then(res => res.json()).then(data => {
+    fetch('http://'+window.location.hostname+':5000/time').then(res => res.json()).then(data => {
       setCurrentTime(data.time);
     });
   }, []);

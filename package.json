@@ -14,8 +14,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "start-api": "venv/Scripts/activate && flask --app api/testukas.py run",
+    "start": "react-scripts start ",
+    "start-api": "venv/Scripts/activate && flask --app api/testukas.py run --host=0.0.0.0",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -37,6 +37,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "proxy": "http://localhost:5000/"
+  }
+  
 }
