@@ -21,7 +21,7 @@ const Room = () => {
 
     useEffect(() => {
         // Establish a WebSocket connection to the server
-        const newSocket = io('http://localhost:5000'); // Replace with your server address
+        const newSocket = io(window.location.hostname+':5000'); // Replace with your server address
         setSocket(newSocket);
 
         newSocket.on('connect', () => {
