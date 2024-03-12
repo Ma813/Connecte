@@ -15,7 +15,7 @@ export default function Header() {
               <Link to={PathConstants.ABOUT}>About</Link>
             </li>
             <li className="nav-item">
-              <Link to={PathConstants.CREATEROOM}>Create Room</Link>
+              <Link to={PathConstants.CREATEROOM}>Play Game</Link>
             </li>
           </ul>
         </nav>

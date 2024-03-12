@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Route, useNavigate } from 'react-router-dom';
+import './Room.css'; // Assuming the CSS file is in the same folder
+
 
 const GameRoom = () => {
     const [roomId, setRoomId] = useState('');
     const navigate = useNavigate();
+    const [inputValue, setInputValue] = useState('');
+    
 
     const createRoom = () => {
         fetch('/getRoom')
@@ -27,11 +31,35 @@ const GameRoom = () => {
     const handleCreateRoomClick = () => {
         createRoom();
     };
+
+    const handleJoinRoomClick = () => {
+        if (inputValue !== '')
+        {
+            navigate(`/room/${inputValue}`);
+        }
+
+        else
+        {
+            document.getElementById('roomIdInput').placeholder = 'Please insert room ID'
+            document.getElementById('roomIdInput').className = 'errorMessage'
+        }
+        
+    }
+
+    const handleChange = (event) => {
+        document.getElementById('roomIdInput').placeholder = 'Input Room ID'
+        document.getElementById('roomIdInput').className = 'roomUIelement'
+        setInputValue(event.target.value);
+    };
       
     return (
         <div>
-            <button onClick={handleCreateRoomClick}>Create Game Room</button>
+            <div><button className='roomUIelement' onClick={handleCreateRoomClick}>Create Game Room</button></div>
+            <div><input id='roomIdInput' className='roomUIelement' type="text" value={inputValue} onChange={handleChange} placeholder='Input Room ID'></input></div>
+            <div><button className='roomUIelement' onClick={handleJoinRoomClick}>Join Game Room</button></div>
         </div>
+        
+
     );
 };
 
