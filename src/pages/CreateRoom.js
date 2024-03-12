@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Route, useNavigate } from 'react-router-dom';
-import './Room.css'; // Assuming the CSS file is in the same folder
+import '../styles/Room.css';
 
 
 const GameRoom = () => {
