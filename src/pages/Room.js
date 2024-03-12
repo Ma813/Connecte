@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import io from 'socket.io-client';
-import Connect4 from './testBoard';
 import '../styles/Connect4Board.css'
 
 const Room = () => {
