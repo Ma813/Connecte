@@ -1,0 +1,39 @@
+.connect4-board {
+    display: flex;
+    flex-direction: column-reverse;
+    border: 3px solid #333;
+    padding: 10px;
+    background-color:#333;
+    min-height: 900px;
+    align-items: center;
+    overflow: hidden;
+    
+  }
+  
+  .row {
+    display: flex;
+  }
+  
+  .circle {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    margin: 10px;
+    
+  }
+ 
+  
+  .empty {
+    background-color:rgb(255, 255, 255);
+  }
+  .empty:hover{
+    background-color: aqua;
+  }
+
+  .red {
+    background-color: red;
+  }
+
+  .yellow {
+    background-color:yellow
+  }

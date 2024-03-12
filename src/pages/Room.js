@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { createBrowserRouter, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import io from 'socket.io-client';
+import Connect4 from './testBoard';
+import '../styles/Connect4Board.css'
 
 const Room = () => {
     const { gameId } = useParams();
@@ -11,15 +13,16 @@ const Room = () => {
     const [win,setWin] = useState(false)
     const [draw,setDraw] = useState(false)
     const [gameState, setGameState] = useState('loading');
-    const fullURL = window.location.href;
+    
+
+    let board1 = new Array(6).fill(null)
+    .map(i => new Array(7).fill(null));
+  
+
+
     useEffect(() => {
         // Establish a WebSocket connection to the server
-      
-        const newSocket = io(window.location.hostname+':5000',{
-
-        });
-        
-        
+        const newSocket = io('http://localhost:5000'); // Replace with your server address
         setSocket(newSocket);
 
         newSocket.on('connect', () => {
@@ -66,39 +69,89 @@ const Room = () => {
 
   const renderWaitingForOnePlayer = () => (
     <div>
-      <p className='message'>Waiting for one more player to join...</p>
-      <p className='message'>Room ID is: <b>{gameId}</b></p>
-      <p className='message'>Invite players with this URL: <b>{fullURL}</b> </p>
-      <button className='copyButton' onClick={copyURL}>Copy URL</button>
-      <button className='copyButton' onClick={copyID}>Copy Room ID</button>
+      <p>Waiting for one more player to join...</p>
       {/* Add any relevant UI elements */}
     </div>
 
   );
 
-  const copyURL = () => {
-    navigator.clipboard.writeText(fullURL)
+  
+ // const dataString = board // should be board
+    const reversedString = () => {
+      //return board.replace(/[^0-2]/g, '');
+      return '[' + board.match(/\[([^[\]]*)\]/g).reverse().join(',') + ']';
+
+    }
+
+    const cleanedString = () =>{
+      return reversedString().replace(/[^0-2]/g, '');
+    }
+    //const newString = cleanedString();
+    //const cleanedString = dataString.replace(/[^0-2\s]/g, '');
+  
+  const renderBoard = (board1) => {
+    let i = 0;
+    for (let rowIndex = 0; rowIndex < board1.length; rowIndex++) {
+
+      for (let colIndex = 0; colIndex < board1[rowIndex].length; colIndex++) {
+
+        const value = cleanedString()[i];
+        if (value === "0") {
+          board1[rowIndex][colIndex] = 'empty';
+        } else if (value === "1") {
+          board1[rowIndex][colIndex] = 'red';
+        } else if (value === "2") {
+          board1[rowIndex][colIndex] = 'yellow';
+        }
+        i++;
+      }
+    }
+
+    return (
+    <div className="connect4-board">
+      
+    {board1.map((row, rowIndex) => (
+      <div key={rowIndex} className="row">
+        {row.map((cell, colIndex) => (
+          <div
+            key={colIndex}
+            className={`circle ${cell || 'empty'}`}
+            
+          ></div>
+        ))}
+      </div>
+    ))}
+  </div>
+
+    )
   }
-  const copyID = () => {
-    navigator.clipboard.writeText(gameId)
-  }
+
+  
+
+
 
   const renderPlayingGame = () => (
     <div>
       <p>Game in progress...
       </p>
+      <div>
+        {cleanedString()}
+      {renderBoard(board1)}
+
+      </div>
+      
       {board}
       {error}
       {move && (
        <div>
           <p>Your turn</p>
-          <button onClick={() => MakeMove(1)}>1</button>
-          <button onClick={() => MakeMove(2)}>2</button>
-          <button onClick={() => MakeMove(3)}>3</button>
-          <button onClick={() => MakeMove(4)}>4</button>
-          <button onClick={() => MakeMove(5)}>5</button>
-          <button onClick={() => MakeMove(6)}>6</button>
-          <button onClick={() => MakeMove(7)}>7</button>
+          <button onClick={() => {MakeMove(1); renderBoard(board1);}}>1</button>
+          <button onClick={() => {MakeMove(2); renderBoard(board1);}}>2</button>
+          <button onClick={() => {MakeMove(3); renderBoard(board1);}}>3</button>
+          <button onClick={() => {MakeMove(4); renderBoard(board1);}}>4</button>
+          <button onClick={() => {MakeMove(5); renderBoard(board1);}}>5</button>
+          <button onClick={() => {MakeMove(6); renderBoard(board1);}}>6</button>
+          <button onClick={() => {MakeMove(7); renderBoard(board1);}}>7</button>
         </div>
       )}
     
@@ -108,7 +161,7 @@ const Room = () => {
   const renderGameEnd = () => (
     <div>
       <p>Game over!</p>
-      {board}
+      {renderBoard(board1)}
       {draw && (
        <div>
           <p>Draw</p>
@@ -171,4 +224,33 @@ const Room = () => {
 
 
 
+
 export default Room;
+/*<div className="connect4-board">
+      
+        {board1.map((row, rowIndex) => (
+          <div key={rowIndex} className="row">
+            {row.map((cell, colIndex) => (
+              <div
+                key={colIndex}
+                className={`circle ${cell || 'empty'}`}
+                
+              ></div>
+            ))}
+          </div>
+        ))}
+      </div>*/
+
+
+      /*<div>
+      {board1.map((row, rowIndex) => (
+  <div key={rowIndex} className="row">
+    {row.map((cell, colIndex) => (
+      <div
+        key={colIndex}
+        className={`circle ${cell === null ? 'empty' : `player-${cell}`}`}
+      ></div>
+    ))}
+  </div>
+))}
+      </div>*/
