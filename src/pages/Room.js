@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import '../styles/Default.css'
 import '../styles/Connect4Board.css'
+import GameEnd from './GameEnd';
 
 
 const Room = () => {
@@ -196,27 +197,10 @@ const Room = () => {
 
   const renderGameEnd = () => (
     <div>
-      <p class = "p1">Game over!</p>
       {renderBoard(board1)}
-      {draw && (
-        <div>
-          <p class = "p1">Draw</p>
-        </div>
-      )}
-      {!draw && win && (
-        <div>
-          <p class = "p1">You won</p>
-        </div>
-      )}
-      {!draw && !win && (
-        <div>
-          <p class = "p1">You lost</p>
-        </div>
-      )}
-       <p class="error">{error}</p>
-       <button className='copyButton' onClick={() => window.location.reload()}>Play again</button>
+      <GameEnd draw={draw} win={win} onRestart={() => window.location.reload()} onHome={() => navigate("/")}/>
     </div>
-  );
+  );  
   const renderLoading = () => (
     <div>
       <p class = "p1">Loading!</p>

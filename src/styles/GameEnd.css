@@ -1,0 +1,41 @@
+.game-end-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75); /* Semi-transparent black */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2; /* Ensure it sits above the game board */
+  }
+  
+  .game-end-content {
+    text-align: center;
+    color: white;
+    font-size: 1.5em; /* Makes text bigger */
+    font-weight: bold; /* Makes text bolder */
+  }
+  
+  .game-end-content p {
+    margin-bottom: 20px; /* Adds more space below the text */
+  }
+  
+  .game-end-content button {
+    margin: 10px;
+    padding: 10px 20px; /* Increase padding for a larger button */
+    font-size: 1.2em; /* Larger font size for the text inside the button */
+    background-color: #007bff; /* A nicer button color, feel free to choose your own */
+    color: white;
+    border: none;
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .game-end-content button:hover {
+    background-color: #0056b3; /* Darker shade when hovered */
+  }
+  
