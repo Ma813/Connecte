@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import '../styles/Default.css'
 import '../styles/Connect4Board.css'
@@ -14,6 +14,7 @@ const Room = () => {
   const [win, setWin] = useState(false)
   const [draw, setDraw] = useState(false)
   const [gameState, setGameState] = useState('loading');
+  const navigate = useNavigate();
 
   const fullURL = window.location.href;
 
@@ -165,6 +166,7 @@ const Room = () => {
   const copyID = () => {
     navigator.clipboard.writeText(gameId)
   }
+  
 
 
   const renderPlayingGame = () => (
@@ -188,7 +190,7 @@ const Room = () => {
       </div>
 
       <p class="error">{error}</p>
-
+      
     </div>
   );
 
@@ -212,6 +214,7 @@ const Room = () => {
         </div>
       )}
        <p class="error">{error}</p>
+       <button className='copyButton' onClick={() => window.location.reload()}>Play again</button>
     </div>
   );
   const renderLoading = () => (
