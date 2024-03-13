@@ -1,7 +1,6 @@
 const PathConstants = {
-    GAME: "/",
     ABOUT: "about",
-    CREATEROOM:"CreateRoom",
+    CREATEROOM:"/",
     ROOM:"room/:gameId"
 }
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Route, useNavigate } from 'react-router-dom';
-import '../styles/Room.css';
-
+import '../styles/Room.css'; // Assuming the CSS file is in the same folder
+import '../styles/Default.css'
 
 const GameRoom = () => {
     const [roomId, setRoomId] = useState('');

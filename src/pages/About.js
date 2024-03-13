@@ -1,3 +1,5 @@
+import '../styles/Default.css'
+
 export default function About() {
     return (
         <div>

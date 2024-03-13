@@ -4,6 +4,7 @@ import Header from "./Header"
 import Footer from "./Footer"
 import Loader from "./Loader"
 import {Suspense} from "react"
+import '../styles/Default.css'
 
 export default function Layout() {
     return (

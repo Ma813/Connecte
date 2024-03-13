@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import '../styles/Default.css'
 
 
 export default function Game() {

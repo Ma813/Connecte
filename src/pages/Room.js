@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import io from 'socket.io-client';
+import '../styles/Default.css'
 import '../styles/Connect4Board.css'
+
 
 const Room = () => {
   const { gameId } = useParams();
@@ -13,6 +15,7 @@ const Room = () => {
   const [draw, setDraw] = useState(false)
   const [gameState, setGameState] = useState('loading');
 
+  const fullURL = window.location.href;
 
   let board1 = new Array(6).fill(null)
     .map(i => new Array(7).fill(null));
@@ -68,16 +71,19 @@ const Room = () => {
 
   const renderWaitingForOnePlayer = () => (
     <div>
-      <p>Waiting for one more player to join...</p>
-      {/* Add any relevant UI elements */}
+      <p className='message'>Waiting for one more player to join...</p>
+      <p className='message'>Room ID is: <b>{gameId}</b></p>
+      <p className='message'>Invite players with this URL: <b>{fullURL}</b> </p>
+      <button className='copyButton' onClick={copyURL}>Copy URL</button>
+      <button className='copyButton' onClick={copyID}>Copy Room ID</button>
     </div>
 
   );
 
 
-  // const dataString = board // should be board
+ 
   const reversedString = () => {
-    //return board.replace(/[^0-2]/g, '');
+    
     return '[' + board.match(/\[([^[\]]*)\]/g).reverse().join(',') + ']';
 
   }
@@ -85,8 +91,7 @@ const Room = () => {
   const cleanedString = () => {
     return reversedString().replace(/[^0-2]/g, '');
   }
-  //const newString = cleanedString();
-  //const cleanedString = dataString.replace(/[^0-2\s]/g, '');
+
 
   const renderBoard = (board1) => {
     let i = 0;
@@ -96,7 +101,12 @@ const Room = () => {
 
         const value = cleanedString()[i];
         if (value === "0") {
-          board1[rowIndex][colIndex] = 'empty';
+          if(move){
+            board1[rowIndex][colIndex] = 'empty';
+          }
+          else{
+            board1[rowIndex][colIndex] = 'empty2';
+          }
         } else if (value === "1") {
           board1[rowIndex][colIndex] = 'red';
         } else if (value === "2") {
@@ -109,7 +119,7 @@ const Room = () => {
     return (
       <div className="connect4-board">
 
-        {board1.map((row, rowIndex) => (
+        {move&&(board1.map((row, rowIndex) => (
           <div key={rowIndex} className="row">
             {row.map((cell, colIndex) => (
               <div
@@ -119,7 +129,17 @@ const Room = () => {
               ></div>
             ))}
           </div>
-        ))}
+        )))}
+        {!move&&(board1.map((row, rowIndex) => (
+          <div key={rowIndex} className="row">
+            {row.map((cell, colIndex) => (
+              <div
+                key={colIndex}
+                className={`circle ${cell || 'empty'}`}
+              ></div>
+            ))}
+          </div>
+        )))}
       </div>
 
     )
@@ -130,22 +150,27 @@ const Room = () => {
     MakeMove(column + 1);
   }
 
+  const copyURL = () => {
+    navigator.clipboard.writeText(fullURL)
+  }
+  const copyID = () => {
+    navigator.clipboard.writeText(gameId)
+  }
 
 
   const renderPlayingGame = () => (
     <div>
-      <p>Game in progress...
-      </p>
+
       <div>
         {move && (
           <div>
-            <p>Your turn</p>
+            <p class = "p1">Your turn</p>
           </div>
         )}
 
         {!move && (
           <div>
-            <p>Not your turn</p>
+            <p class = "p1">Opponents turn</p>
           </div>
         )}
         
@@ -153,46 +178,46 @@ const Room = () => {
 
       </div>
 
-      {error}
+      <p class="error">{error}</p>
 
     </div>
   );
 
   const renderGameEnd = () => (
     <div>
-      <p>Game over!</p>
+      <p class = "p1">Game over!</p>
       {renderBoard(board1)}
       {draw && (
         <div>
-          <p>Draw</p>
+          <p class = "p1">Draw</p>
         </div>
       )}
       {!draw && win && (
         <div>
-          <p>You won</p>
+          <p class = "p1">You won</p>
         </div>
       )}
       {!draw && !win && (
         <div>
-          <p>You lost</p>
+          <p class = "p1">You lost</p>
         </div>
       )}
     </div>
   );
   const renderLoading = () => (
     <div>
-      <p>Loading!</p>
-      {/* Display game results or options for starting a new game */}
+      <p class = "p1">Loading!</p>
+
     </div>
   );
   const renderNoRoom = () => (
     <div>
-      <p>No room found</p>
-      {/* Display game results or options for starting a new game */}
+      <p class = "p1">No room found</p>
+
     </div>
   );
 
-  // Determine which UI component to render based on game state
+
   let uiComponent;
   switch (gameState) {
     case 'no_room_found':
@@ -217,7 +242,7 @@ const Room = () => {
   return (
     <div>
       {uiComponent}
-      {/* Add event handlers or buttons to trigger state changes */}
+
     </div>
   );
 };
@@ -226,31 +251,3 @@ const Room = () => {
 
 
 export default Room;
-/*<div className="connect4-board">
-      
-        {board1.map((row, rowIndex) => (
-          <div key={rowIndex} className="row">
-            {row.map((cell, colIndex) => (
-              <div
-                key={colIndex}
-                className={`circle ${cell || 'empty'}`}
-                
-              ></div>
-            ))}
-          </div>
-        ))}
-      </div>*/
-
-
-/*<div>
-{board1.map((row, rowIndex) => (
-<div key={rowIndex} className="row">
-{row.map((cell, colIndex) => (
-<div
-  key={colIndex}
-  className={`circle ${cell === null ? 'empty' : `player-${cell}`}`}
-></div>
-))}
-</div>
-))}
-</div>*/
