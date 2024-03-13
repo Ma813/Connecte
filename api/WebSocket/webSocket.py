@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from flask_socketio import SocketIO, emit, join_room, leave_room
+from flask_socketio import SocketIO, emit, join_room, leave_room, rooms
 from flask_cors import CORS
 import random
 import time
@@ -97,10 +97,20 @@ def handleMove(data):
                         
     
     
-@socketio.on('leave')
-def handleLeave(data):
-    room_id = data['roomId']
-    leave_room(room_id)
-    
-    emit('message', {'msg': 'has left the room'}, room=gameId)
+@socketio.on('disconnect')
+def handleLeave():
 
+    userRoom = rooms(request.sid)[0]
+    if(len(userRoom) != 8):
+        userRoom = rooms(request.sid)[1]
+   
+    if userRoom not in games:
+       
+        return
+  
+    for x in games[userRoom][1].players:
+        if(x[1] == request.sid):
+            emit('message',{'state':'game_end','board':games[userRoom][1].getBoardString(), 'move':False, 'winner':True , 'draw':False, 'error':'opponent disconnected'}, room=userRoom)
+            games[userRoom][1].changeState()
+
+    leave_room(userRoom)

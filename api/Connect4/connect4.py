@@ -15,7 +15,7 @@ class Connect4:
         self.board = np.zeros((h, w))
 
     def getState():
-        return state
+        return self.state
 
     def getBoardString(self):
         return np.array2string(self.board)

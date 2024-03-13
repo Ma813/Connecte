@@ -28,13 +28,15 @@ const Room = () => {
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
-      console.log('Connected to server');
+      
       newSocket.emit('join', { 'gameId': gameId });
+      
     });
+    
 
     newSocket.on('message', (data) => {
       const state = data['state'];
-      //console.log(data)
+   
       if (state == 'playing_game') {
         setBoard(data['board']);
         setMove(data['move']);
@@ -50,15 +52,22 @@ const Room = () => {
         setMove(data['move']);
         setWin(data['winner'])
         setDraw(data['draw'])
+        if ('error' in data) {
+          setError(data['error'])
+        }
+        else {
+          setError(null)
+        }
       }
 
 
       setGameState(state);
 
     });
-
+    
     return () => {
       // Clean up: disconnect the WebSocket when the component unmounts
+      
       newSocket.disconnect();
     };
   }, [gameId]);
@@ -146,7 +155,7 @@ const Room = () => {
   }
 
   const handleCellClick = (column) => {
-    console.log("Clicked cell");
+
     MakeMove(column + 1);
   }
 
@@ -202,6 +211,7 @@ const Room = () => {
           <p class = "p1">You lost</p>
         </div>
       )}
+       <p class="error">{error}</p>
     </div>
   );
   const renderLoading = () => (
