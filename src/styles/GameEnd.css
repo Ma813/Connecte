@@ -4,38 +4,41 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.75); /* Semi-transparent black */
+    background-color: rgba(0, 0, 0, 0.75); 
     color: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2; /* Ensure it sits above the game board */
+    z-index: 2; 
   }
   
   .game-end-content {
     text-align: center;
     color: white;
-    font-size: 1.5em; /* Makes text bigger */
-    font-weight: bold; /* Makes text bolder */
+    font-size: 1.5em; 
+    font-weight: bold;
   }
   
   .game-end-content p {
-    margin-bottom: 20px; /* Adds more space below the text */
+    margin-bottom: 20px; 
   }
   
   .game-end-content button {
     margin: 10px;
-    padding: 10px 20px; /* Increase padding for a larger button */
-    font-size: 1.2em; /* Larger font size for the text inside the button */
-    background-color: #007bff; /* A nicer button color, feel free to choose your own */
+    padding: 10px 20px; 
+    font-size: 1.2em; 
+    background-color: #007bff; 
     color: white;
     border: none;
-    border-radius: 5px; /* Rounded corners */
+    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+    transition: background-color 0.3s ease; 
   }
   
   .game-end-content button:hover {
-    background-color: #0056b3; /* Darker shade when hovered */
+    background-color: #0056b3; 
+  }
+  .error {
+    color: red;
   }
   

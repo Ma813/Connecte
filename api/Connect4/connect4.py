@@ -36,6 +36,8 @@ class Connect4:
 
     # returns true if placing a tile was successful
     def placeTile(self, row):
+        if int(row) not in self.legalMoves():
+            raise Exceoption("Not a legal move")
         for i in range(self.h):
             if self.board[self.h - 1 - i][row] == 0:
                 self.board[self.h - 1 - i][row] = self.toMove[0]
