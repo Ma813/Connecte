@@ -28,11 +28,9 @@ def generateId(lenght):
 
 @socketio.on('join')
 def handleJoin(data): 
-
+    if 'gameId' not in data:
+        return
     gameId = data['gameId']
-
- 
-
     if gameId in games:
         if(games[gameId][1].state == 1):
             join_room(gameId)
@@ -43,42 +41,22 @@ def handleJoin(data):
         join_room(gameId)
         emit('message',{'state':'waiting_for_one_player'})
         if(games[gameId][1].state == 1):
-            emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False}, room=gameId)
-            emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True}, room=games[gameId][1].toMove[1])
+            emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0]}, room=gameId)
+            emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'color':games[gameId][1].toMove[0]}, room=games[gameId][1].toMove[1])
         return
     emit('message',{'state':'no_room_found'})
 
 @socketio.on('move')
 def handleMove(data): 
-
-    gameId = data['gameId']
-
-    if gameId not in games:
-        emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'error':'Invalid game'}, room=request.sid)
+    try:
+        gameId = data['gameId']
+        game = games[gameId][1]
+        move = int(data['move'])
+        game.placeTile(move)
+    except:
+        emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'error':'Row already full', 'color':games[gameId][1].toMove[0]}, room=request.sid)
         return
 
-    game = games[gameId][1]
-
-    if(game.state != 1):
-        emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'error':'Game is not in progress'}, room=request.sid)
-        return
-
-    if(request.sid != game.toMove[1]):
-        emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'error':'Wrong turn'}, room=request.sid)
-        return
-
-    if 'move' not in data:
-        emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'error':'no move sent'}, room=request.sid)
-        return
-    
-    move = int(data['move'])
-    
-    if move not in game.legalMoves():
-        emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'error':'Invalid move'}, room=request.sid)
-        return
-
-    game.placeTile(move)
-    
     if(game.checkForWin()):
         emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':False , 'draw':False}, room=gameId)
         emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':True , 'draw':False}, room=games[gameId][1].toMove[1])
@@ -91,8 +69,8 @@ def handleMove(data):
         return
 
     game.changeToMove()
-    emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False}, room=gameId)
-    emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True}, room=games[gameId][1].toMove[1])
+    emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0]}, room=gameId)
+    emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'color':games[gameId][1].toMove[0]}, room=games[gameId][1].toMove[1])
     return
                         
     
@@ -105,7 +83,6 @@ def handleLeave():
         userRoom = rooms(request.sid)[1]
    
     if userRoom not in games:
-       
         return
   
     for x in games[userRoom][1].players:

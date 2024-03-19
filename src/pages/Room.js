@@ -1,32 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, createBrowserRouter } from 'react-router-dom';
 import io from 'socket.io-client';
 import '../styles/Default.css'
 import '../styles/Connect4Board.css'
-import GameEnd from './GameEnd';
+import GameEnd from './Game/GameEnd';
+import DrawBoard from './Game/DrawBoard'
 
 
 const Room = () => {
   const { gameId } = useParams();
   const [socket, setSocket] = useState(null);
-  const [board, setBoard] = useState(null);
+  const [boardString, setBoard] = useState(null);
   const [move, setMove] = useState(null);
   const [error, setError] = useState(null);
   const [win, setWin] = useState(false)
-  const [draw, setDraw] = useState(false)
+  const [draw, setDraw] = useState(false);
   const [gameState, setGameState] = useState('loading');
+  const [color, setColor] = useState(null);
   const navigate = useNavigate();
+
+  let board = new Array(6).fill(null)
+  .map(i => new Array(7).fill(null));
 
   const fullURL = window.location.href;
 
-  let board1 = new Array(6).fill(null)
-    .map(i => new Array(7).fill(null));
-
-
-
   useEffect(() => {
+
     // Establish a WebSocket connection to the server
-    const newSocket = io(window.location.hostname + ':5000'); // Replace with your server address
+    const newSocket = io(window.location.hostname + ':5000');
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
@@ -38,10 +39,11 @@ const Room = () => {
 
     newSocket.on('message', (data) => {
       const state = data['state'];
-   
+      
       if (state == 'playing_game') {
         setBoard(data['board']);
         setMove(data['move']);
+        setColor(data['color'])
         if ('error' in data) {
           setError(data['error'])
         }
@@ -68,16 +70,12 @@ const Room = () => {
     });
     
     return () => {
-      // Clean up: disconnect the WebSocket when the component unmounts
+
       
       newSocket.disconnect();
     };
   }, [gameId]);
 
-  const MakeMove = (move) => {
-
-    socket.emit('move', { 'gameId': gameId, 'move': move - 1 });
-  };
 
 
   const renderWaitingForOnePlayer = () => (
@@ -91,75 +89,7 @@ const Room = () => {
 
   );
 
-
  
-  const reversedString = () => {
-    
-    return '[' + board.match(/\[([^[\]]*)\]/g).reverse().join(',') + ']';
-
-  }
-
-  const cleanedString = () => {
-    return reversedString().replace(/[^0-2]/g, '');
-  }
-
-
-  const renderBoard = (board1) => {
-    let i = 0;
-    for (let rowIndex = 0; rowIndex < board1.length; rowIndex++) {
-
-      for (let colIndex = 0; colIndex < board1[rowIndex].length; colIndex++) {
-
-        const value = cleanedString()[i];
-        if (value === "0") {
-          if(move){
-            board1[rowIndex][colIndex] = 'empty';
-          }
-          else{
-            board1[rowIndex][colIndex] = 'empty2';
-          }
-        } else if (value === "1") {
-          board1[rowIndex][colIndex] = 'red';
-        } else if (value === "2") {
-          board1[rowIndex][colIndex] = 'yellow';
-        }
-        i++;
-      }
-    }
-
-    return (
-      <div className="connect4-board">
-
-        {move&&(board1.map((row, rowIndex) => (
-          <div key={rowIndex} className="row">
-            {row.map((cell, colIndex) => (
-              <div
-                key={colIndex}
-                className={`circle ${cell || 'empty'}`}
-                onClick={() => handleCellClick(colIndex)}
-              ></div>
-            ))}
-          </div>
-        )))}
-        {!move&&(board1.map((row, rowIndex) => (
-          <div key={rowIndex} className="row">
-            {row.map((cell, colIndex) => (
-              <div
-                key={colIndex}
-                className={`circle ${cell || 'empty'}`}
-              ></div>
-            ))}
-          </div>
-        )))}
-      </div>
-
-    )
-  }
-
-  const handleCellClick = (column) => {
-
-    MakeMove(column + 1);
-  }
 
   const copyURL = () => {
     navigator.clipboard.writeText(fullURL)
@@ -171,34 +101,13 @@ const Room = () => {
 
 
   const renderPlayingGame = () => (
-    <div>
-
-      <div>
-        {move && (
-          <div>
-            <p class = "p1">Your turn</p>
-          </div>
-        )}
-
-        {!move && (
-          <div>
-            <p class = "p1">Opponents turn</p>
-          </div>
-        )}
-        
-        {renderBoard(board1)}
-
-      </div>
-
-      <p class="error">{error}</p>
-      
-    </div>
+    <DrawBoard board={board} boardString={boardString} move = {move} color = {color} MakeMove = {MakeMove} error = {error} GameEnd = {false}/>
   );
 
   const renderGameEnd = () => (
     <div>
-      {renderBoard(board1)}
-      <GameEnd draw={draw} win={win} onRestart={() => window.location.reload()} onHome={() => navigate("/")}/>
+      <DrawBoard board={board} boardString={boardString} move = {false} color = {color} MakeMove = {MakeMove} error = {error} GameEnd = {true}/>
+      <GameEnd draw={draw} win={win} error={error} onRestart={() => window.location.reload()} onHome={() => navigate("/")}/>
     </div>
   );  
   const renderLoading = () => (
@@ -213,6 +122,12 @@ const Room = () => {
 
     </div>
   );
+
+  const MakeMove = (move) => {
+
+    socket.emit('move', { 'gameId': gameId, 'move': move - 1 });
+  };
+
 
 
   let uiComponent;

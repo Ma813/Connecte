@@ -1,7 +1,7 @@
 import React from 'react';
-import '../styles/GameEnd.css';
+import '../../styles/GameEnd.css';
 
-const GameEnd = ({ draw, win, onRestart, onHome}) => {
+const GameEnd = ({ draw, win, onRestart, onHome, error}) => {
   return (
     <div className="game-end-overlay">
       <div className="game-end-content">
@@ -10,9 +10,11 @@ const GameEnd = ({ draw, win, onRestart, onHome}) => {
           <p>It's a draw!</p>
         ) : win ? (
           <p>Congratulations! You won!</p>
+
         ) : (
           <p>Sorry, you lost. Better luck next time!</p>
         )}
+        <p className='error'>{error}</p>
         <button onClick={onRestart}>Play Again</button>
         <button onClick={onHome}>Home</button>
       </div>
