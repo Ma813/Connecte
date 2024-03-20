@@ -17,6 +17,7 @@ const Room = () => {
   const [draw, setDraw] = useState(false);
   const [gameState, setGameState] = useState('loading');
   const [color, setColor] = useState(null);
+
   const navigate = useNavigate();
 
   let board = new Array(6).fill(null)
@@ -24,20 +25,31 @@ const Room = () => {
 
   const fullURL = window.location.href;
 
+  function getCookie(name) {
+    function escape(s) { return s.replace(/([.*+?\^$(){}|\[\]\/\\])/g, '\\$1'); }
+    var match = document.cookie.match(RegExp('(?:^|;\\s*)' + escape(name) + '=([^;]*)'));
+    return match ? match[1] : null;
+}
+
   useEffect(() => {
 
-    // Establish a WebSocket connection to the server
+    
     const newSocket = io(window.location.hostname + ':5000');
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
       
-      newSocket.emit('join', { 'gameId': gameId });
+      newSocket.emit('join', { 'gameId': gameId, 'id':getCookie('id') });
       
     });
     
+    newSocket.on('cookie', (data) => {
+      document.cookie = 'id='+data['id'];
+
+    });
 
     newSocket.on('message', (data) => {
+
       const state = data['state'];
       
       if (state == 'playing_game') {

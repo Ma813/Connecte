@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, copy_current_request_context
 from flask_socketio import SocketIO, emit, join_room, leave_room, rooms
 from flask_cors import CORS
+from threading import Thread
 import random
 import time
 from Connect4.connect4 import Connect4
@@ -16,15 +17,20 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # Dictionary to store active rooms
 games = {}
 
+
+
 @app.route('/getRoom')
 def getRoom():
-    gameId ="".join(generateId(8)) 
+    gameId =generateId(8)
     games[gameId] = [time.time(),Connect4()]
+
     return {'gameId':gameId}
+
+
 
 def generateId(lenght):
     characters = "qwertyuiopasdfghjklzxcvbnm123456789"
-    return random.sample(characters,lenght)
+    return "".join(random.sample(characters,lenght))
 
 @socketio.on('join')
 def handleJoin(data): 
@@ -33,11 +39,27 @@ def handleJoin(data):
     gameId = data['gameId']
     if gameId in games:
         if(games[gameId][1].state == 1):
+            for x in games[gameId][1].players:
+                if(data['id'] == x[2]):
+                    join_room(gameId)
+                    x[1] = request.sid
+                    emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0]}, room=gameId)
+                    emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'color':games[gameId][1].toMove[0]}, room=games[gameId][1].toMove[1])
+                    return
+
             join_room(gameId)
-            emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False}, room=gameId)
+            emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0] }, room=gameId)
             return
-        games[gameId][1].addPlayer(request.sid)
-        games[gameId][0] = time.time()
+        print(data['id'])
+        if(data['id'] == None):
+            id = generateId(15)
+        else:
+            id = data['id']
+        
+        games[gameId][1].addPlayer(request.sid,id)
+        games[gameId][0] = time.time()    
+        print(id)
+        emit('cookie',{'id':id})
         join_room(gameId)
         emit('message',{'state':'waiting_for_one_player'})
         if(games[gameId][1].state == 1):
@@ -53,6 +75,7 @@ def handleMove(data):
         game = games[gameId][1]
         move = int(data['move'])
         game.placeTile(move)
+        
     except:
         emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'error':'Row already full', 'color':games[gameId][1].toMove[0]}, room=request.sid)
         return
@@ -77,6 +100,22 @@ def handleMove(data):
     
 @socketio.on('disconnect')
 def handleLeave():
+    @copy_current_request_context
+    def AbandonGame(userRoom,id):
+        samebrowser = True
+        firstid = games[userRoom][1].players[0][2]
+        for x in games[userRoom][1].players:
+            print(x)
+            if(x[2] != firstid):
+                samebrowser = False
+                print("lenkai")
+        print(samebrowser)
+        if(samebrowser == False):
+            time.sleep(15)
+        for x in games[userRoom][1].players:
+            if(x[1] == id):
+                emit('message',{'state':'game_end','board':games[userRoom][1].getBoardString(), 'move':False, 'winner':True , 'draw':False, 'error':'opponent disconnected'}, room=userRoom)
+                games[userRoom][1].changeState()
 
     userRoom = rooms(request.sid)[0]
     if(len(userRoom) != 8):
@@ -87,7 +126,8 @@ def handleLeave():
   
     for x in games[userRoom][1].players:
         if(x[1] == request.sid):
-            emit('message',{'state':'game_end','board':games[userRoom][1].getBoardString(), 'move':False, 'winner':True , 'draw':False, 'error':'opponent disconnected'}, room=userRoom)
-            games[userRoom][1].changeState()
+           thread = Thread(target = AbandonGame , args = (userRoom,request.sid))
+           thread.start()
 
     leave_room(userRoom)
+
