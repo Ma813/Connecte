@@ -1,25 +1,18 @@
-from flask import Flask, render_template, request, copy_current_request_context
-from flask_socketio import SocketIO, emit, join_room, leave_room, rooms
-from flask_cors import CORS
+from flask import Flask, Blueprint, render_template, request, copy_current_request_context
+from flask_socketio import emit, join_room, leave_room, rooms
 from threading import Thread
 import random
 import time
 from Connect4.connect4 import Connect4
-app = Flask(__name__)
-cors = CORS(app, resource={
-    r"/*":{
-        "origins":"*"
-    }
-})
+from extensions import cors, socketio
 
-socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Dictionary to store active rooms
+
 games = {}
 
+room = Blueprint(name="room", import_name=__name__)
 
-
-@app.route('/getRoom')
+@room.route("/getRoom", methods=["GET"], strict_slashes=False)
 def getRoom():
     gameId =generateId(8)
     games[gameId] = [time.time(),Connect4()]
