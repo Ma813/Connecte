@@ -5,6 +5,7 @@ import random
 import time
 from Connect4.connect4 import Connect4
 from extensions import cors, socketio
+from DB.database import registerGame, createGuestPlayer, userExists
 
 
 
@@ -14,16 +15,17 @@ room = Blueprint(name="room", import_name=__name__)
 
 @room.route("/getRoom", methods=["GET"], strict_slashes=False)
 def getRoom():
-    gameId =generateId(8)
+    gameId = generateId(8)
     games[gameId] = [time.time(),Connect4()]
 
     return {'gameId':gameId}
 
 
 
-def generateId(lenght):
+def generateId(lenght, prefix=""):
     characters = "qwertyuiopasdfghjklzxcvbnm123456789"
-    return "".join(random.sample(characters,lenght))
+    return prefix.join(random.sample(characters,lenght))
+    
 
 @socketio.on('join')
 def handleJoin(data): 
@@ -48,6 +50,12 @@ def handleJoin(data):
             id = generateId(15)
         else:
             id = data['id']
+
+
+        # if data['username'] == None and data['id'] == None:
+            
+
+        
         
         games[gameId][1].addPlayer(request.sid,id)
         games[gameId][0] = time.time()    
@@ -64,6 +72,7 @@ def handleJoin(data):
 @socketio.on('move')
 def handleMove(data): 
     try:
+        print(data)
         gameId = data['gameId']
         game = games[gameId][1]
         move = int(data['move'])
@@ -74,7 +83,9 @@ def handleMove(data):
         return
 
     if(game.checkForWin()):
-        emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':False , 'draw':False}, room=gameId)
+        data = registerGame(game.getBoardString(), games[gameId][1].players, games[gameId][1].toMove[1])
+        error= data['message']
+        emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':False , 'draw':False, 'error':error}, room=gameId)
         emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':True , 'draw':False}, room=games[gameId][1].toMove[1])
         game.changeState()
         return

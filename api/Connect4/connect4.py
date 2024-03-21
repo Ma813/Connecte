@@ -3,7 +3,6 @@ import random
 
 
 class Connect4:
- 
     def __init__(self, h=6, w=7, k=4,playerCount = 2):
         self.h = h
         self.w = w
@@ -37,7 +36,7 @@ class Connect4:
     # returns true if placing a tile was successful
     def placeTile(self, row):
         if int(row) not in self.legalMoves():
-            raise Exceoption("Not a legal move")
+            raise Exception("Not a legal move")
         for i in range(self.h):
             if self.board[self.h - 1 - i][row] == 0:
                 self.board[self.h - 1 - i][row] = self.toMove[0]
