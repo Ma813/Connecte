@@ -15,6 +15,7 @@ pepper = json.load(open("config.json"))
 
 class PLAYERS(da.Model):
     username = da.Column(da.String(50), primary_key=True)
+    token = da.Column(da.String(255))
     hashed_pass = da.Column(da.String(255))
     email = da.Column(da.String(255))
 
@@ -40,6 +41,7 @@ def createPlayer():
         usern = data['username']
         passw = data['hashed_pass']
         mail = data['email']
+        id = data['id']
 
         if len(usern) < 5:
             return {'message': 'Username must be at least 5 characters long'}
@@ -56,17 +58,21 @@ def createPlayer():
         salt = bcrypt.gensalt()
         passw = bcrypt.hashpw(passw.encode('utf-8'), salt)
 
-        pl = PLAYERS(username=usern, hashed_pass=passw, email=mail)
+        pl = PLAYERS(username=usern, hashed_pass=passw, email=mail, token = id)
         da.session.add(pl)
         da.session.commit()
 
         return {'message': f'Added {usern} to database'}
     except Exception as e:
         return {'message': str(e)}
+    
+
+def checkToken(token):
+    return PLAYERS.query.filter_by(token=token).first()
 
 
 def createGuestPlayer(id):
-    pl = PLAYERS(username=id, hashed_pass="", email="")
+    pl = PLAYERS(username=id, hashed_pass="", email="", token=id)
     da.session.add(pl)
     da.session.commit()
 
