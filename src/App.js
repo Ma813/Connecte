@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import routes from "./routes";
 import Layout from "./components/Layout";
 import Page404 from "./pages/Page404";
+import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
   const router = createBrowserRouter([
@@ -13,7 +14,11 @@ function App() {
     }
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider> {/* Wrap RouterProvider in AuthProvider */}
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
 }
 
 export default App;

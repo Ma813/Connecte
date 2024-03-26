@@ -1,7 +1,10 @@
 const PathConstants = {
     ABOUT: "about",
     CREATEROOM:"/",
-    ROOM:"room/:gameId"
+    LOGIN:"login",
+    ROOM:"room/:gameId",
+    REGISTER:"register",
+    PROFILE:"profile"
 }
 
 export default PathConstants

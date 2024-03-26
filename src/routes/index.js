@@ -5,9 +5,15 @@ import PathConstants from "./constants"
 const About = React.lazy(() => import("../pages/About"))
 const CreateRoom = React.lazy(() => import("../pages/CreateRoom"))
 const Room = React.lazy(() => import("../pages/Room"))
+const PROFILE = React.lazy(() => import("../pages/Profile"))
+const REGISTER = React.lazy(() => import("../pages/RegisterPage"))
+const LOGIN = React.lazy(() => import("../pages/LoginPage"))
 const routes = [
     { path: PathConstants.ABOUT, element: <About /> },
     { path: PathConstants.CREATEROOM, element: <CreateRoom /> },
     { path: PathConstants.ROOM, element: <Room /> },
+    { path: PathConstants.PROFILE, element: <PROFILE /> },
+    { path: PathConstants.REGISTER, element: <REGISTER /> },
+    { path: PathConstants.LOGIN, element: <LOGIN /> },
 ]
 export default routes
