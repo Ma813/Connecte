@@ -17,15 +17,16 @@ const RegisterPage = () => {
     if (password !== confirmPassword) {
       return setError('Passwords do not match');
     }
+    
 
     setError(''); // Reset error message
 
     try {
       // Attempt to register with additional information
       await register(email, password, name);
-      navigate('/'); // Navigate to home or another page upon successful registration
+      navigate('/login')
     } catch (err) {
-      setError('Failed to create an account');
+      setError(err.message);
     }
   };
 

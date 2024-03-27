@@ -3,9 +3,11 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import routes from "./routes";
 import Layout from "./components/Layout";
 import Page404 from "./pages/Page404";
-import { AuthProvider } from './contexts/AuthContext';
+import { useAuth,AuthProvider } from './contexts/AuthContext';
 
 function App() {
+
+  
   const router = createBrowserRouter([
     {
       element: <Layout />,

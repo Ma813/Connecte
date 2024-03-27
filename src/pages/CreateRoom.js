@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Route, useNavigate } from 'react-router-dom';
 import '../styles/Room.css'; // Assuming the CSS file is in the same folder
 import '../styles/Default.css'
+import path from '../Path'
 
 const GameRoom = () => {
     const [roomId, setRoomId] = useState('');
@@ -10,7 +11,7 @@ const GameRoom = () => {
     
 
     const createRoom = () => {
-        fetch('http://'+window.location.hostname+':5000/getRoom')
+        fetch(path+'/getRoom')
             .then(response => response.json())
             .then(data => {
                 // Set the API data to the state variable

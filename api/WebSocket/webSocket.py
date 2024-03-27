@@ -5,7 +5,7 @@ import random
 import time
 from Connect4.connect4 import Connect4
 from extensions import cors, socketio
-from DB.database import registerGame, createGuestPlayer, userExists, generateId, checkToken
+from DB.database import registerGame, generateId, checkToken
 
 
 
@@ -75,14 +75,14 @@ def handleMove(data):
         return
 
     if(game.checkForWin()):
-        data = registerGame(game.getBoardString(), games[gameId][1].players, games[gameId][1].toMove[1])
-        error= data['message']
-        emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':False , 'draw':False, 'error':error}, room=gameId)
+        data = registerGame(game.getBoardString(), games[gameId][1].players, games[gameId][1].toMove)
+        emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':False , 'draw':False}, room=gameId)
         emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':True , 'draw':False}, room=games[gameId][1].toMove[1])
         game.changeState()
         return
 
     if(game.checkForDraw()):
+        data = registerGame(game.getBoardString(), games[gameId][1].players, None)
         emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':False , 'draw':True}, room=gameId)
         game.changeState()
         return
@@ -104,12 +104,12 @@ def handleLeave():
             print(x)
             if(x[2] != firstid):
                 samebrowser = False
-                print("lenkai")
         print(samebrowser)
         if(samebrowser == False):
             time.sleep(15)
         for x in games[userRoom][1].players:
             if(x[1] == id):
+                data = registerGame(games[userRoom][1].getBoardString(), games[userRoom][1].players, x)
                 emit('message',{'state':'game_end','board':games[userRoom][1].getBoardString(), 'move':False, 'winner':True , 'draw':False, 'error':'opponent disconnected'}, room=userRoom)
                 games[userRoom][1].changeState()
 

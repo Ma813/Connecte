@@ -18,7 +18,9 @@ def register_extensions(app):
     r"/*":{
         "origins":"*"
     }
-    })
+    },
+    CORS_SUPPORTS_CREDENTIALS = True
+    )
     socketio.init_app(app, cors_allowed_origins="*")
     da.init_app(app)
 
