@@ -5,7 +5,7 @@ import random
 import time
 from Connect4.connect4 import Connect4
 from extensions import cors, socketio
-from DB.database import registerGame, createGuestPlayer, userExists
+from DB.database import registerGame, createGuestPlayer, userExists, generateId, checkToken
 
 
 
@@ -20,12 +20,6 @@ def getRoom():
 
     return {'gameId':gameId}
 
-
-
-def generateId(lenght, prefix=""):
-    characters = "qwertyuiopasdfghjklzxcvbnm123456789"
-    return prefix.join(random.sample(characters,lenght))
-    
 
 @socketio.on('join')
 def handleJoin(data): 
@@ -45,22 +39,19 @@ def handleJoin(data):
             join_room(gameId)
             emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0] }, room=gameId)
             return
-        print(data['id'])
         if(data['id'] == None):
             id = generateId(15)
         else:
             id = data['id']
-
-
-        # if data['username'] == None and data['id'] == None:
-            
-
-        
-        
-        games[gameId][1].addPlayer(request.sid,id)
-        games[gameId][0] = time.time()    
+        print(data)
+        if(checkToken(data['token']) != None):
+            token = data['token']
+        else:
+            token = -1
+        games[gameId][1].addPlayer(request.sid,id,token)
+        games[gameId][0]=time.time()    
         print(id)
-        emit('cookie',{'id':id})
+        emit('cookie',{'id':id}, room=request.sid)
         join_room(gameId)
         emit('message',{'state':'waiting_for_one_player'})
         if(games[gameId][1].state == 1):
@@ -68,6 +59,7 @@ def handleJoin(data):
             emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'color':games[gameId][1].toMove[0]}, room=games[gameId][1].toMove[1])
         return
     emit('message',{'state':'no_room_found'})
+
 
 @socketio.on('move')
 def handleMove(data): 

@@ -6,8 +6,9 @@ import json
 import bcrypt
 import hmac
 import hashlib
-
+import random
 import datetime
+import string
 
 datab = Blueprint(name="datab", import_name=__name__)
 pepper = json.load(open("config.json"))
@@ -34,6 +35,9 @@ class PLAYERS_GAMES(da.Model):
     which_turn = da.Column(da.Integer)
 
 
+def generateId(lenght, prefix=""):
+    return prefix.join(random.choices(string.ascii_lowercase + string.digits, k=lenght))
+
 @datab.route('/registerPlayer', methods=['POST'])
 def createPlayer():
     try:
@@ -41,7 +45,6 @@ def createPlayer():
         usern = data['username']
         passw = data['hashed_pass']
         mail = data['email']
-        id = data['id']
 
         if len(usern) < 5:
             return {'message': 'Username must be at least 5 characters long'}
@@ -58,7 +61,7 @@ def createPlayer():
         salt = bcrypt.gensalt()
         passw = bcrypt.hashpw(passw.encode('utf-8'), salt)
 
-        pl = PLAYERS(username=usern, hashed_pass=passw, email=mail, token = id)
+        pl = PLAYERS(username=usern, hashed_pass=passw, email=mail, token = "")
         da.session.add(pl)
         da.session.commit()
 
@@ -68,8 +71,9 @@ def createPlayer():
     
 
 def checkToken(token):
-    return PLAYERS.query.filter_by(token=token).first()
-
+    if token != "" or token != None:
+        return PLAYERS.query.filter_by(token=token).first()
+    return None
 
 def createGuestPlayer(id):
     pl = PLAYERS(username=id, hashed_pass="", email="", token=id)
@@ -114,13 +118,18 @@ def checkUser():
         data = request.get_json()
         usern = data['username']
         passw = data['hashed_pass']
-
+        
         user = PLAYERS.query.filter_by(username=usern).first()
+        
+        print(type(passw))
         if not user:
-            return {'message': 'User not found'}
-        if not bcrypt.checkpw(hmac.new(pepper["Pepper"].encode('utf-8'), passw.encode('utf-8'), hashlib.sha256).hexdigest().encode('utf-8'), user.hashed_pass):
-            return {'message': 'Incorrect password'}
-        return {'message': 'Success'}
+            return {'message': 'User not found or Incorrect password'}
+        if not bcrypt.checkpw(hmac.new(pepper["Pepper"].encode('utf-8'), passw.encode('utf-8'), hashlib.sha256).hexdigest().encode('utf-8'), str.encode(user.hashed_pass, 'utf-8')):
+            return {'message': 'User not found or Incorrect password'}
+        token = generateId(255)
+        user.token = token
+        da.session.commit()
+        return {'token' : token}
     except Exception as e:
         return {'message': str(e)}
 

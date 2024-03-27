@@ -7,7 +7,7 @@ class Connect4:
         self.h = h
         self.w = w
         self.k = k
-        self.toMove = [-1, -1, -1]
+        self.toMove = [-1, -1, -1, -1]
         self.players = []
         self.playerCount = playerCount
         self.state = 0
@@ -75,12 +75,13 @@ class Connect4:
                     return True
         return False
 
-    def addPlayer(self, requestid,id):
+    def addPlayer(self, requestid,id,token):
         playerNumber = len(self.players)
-        self.players.append([playerNumber + 1, requestid, id])
+        self.players.append([playerNumber + 1, requestid, id,token])
         if len(self.players) == self.playerCount:
             self.changeState()
             return
+        print(self.players)
 
     def changeToMove(self):
         toMoveIndex = self.players.index(self.toMove) + 1
