@@ -35,8 +35,8 @@ const LoginPage = () => {
               {error && <div className="alert alert-danger" role="alert">{error}</div>}
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                  <label className="text-secondary" htmlFor="email">Email address</label>
-                  <input type="email" className="form-control" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                  <label className="text-secondary" htmlFor="name">Username</label>
+                  <input type="text" className="form-control" id="name" value={email} onChange={(e) => setEmail(e.target.value)} required />
                 </div>
                 <div className="form-group">
                   <label className="text-secondary" htmlFor="password">Password</label>
