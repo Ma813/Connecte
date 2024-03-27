@@ -21,7 +21,7 @@ const LoginPage = () => {
       navigate('/'); // Navigate to home page or dashboard after login
     } catch (err) {
       // If login fails, display an error message
-      setError('Failed to log in');
+      setError(err.message);
     }
   };
 

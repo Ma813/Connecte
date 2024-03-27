@@ -3,9 +3,18 @@ import "../styles/Header.css";
 import PathConstants from "../routes/constants";
 import '../styles/Default.css';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Header() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout,CheckIfAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  CheckIfAuthenticated()
+  
+  const handleSubmit = async (e) => {
+    logout()
+    navigate('/')
+  }
+  
   return (
     <header>
       <div className="header-div">
@@ -27,7 +36,7 @@ export default function Header() {
                   <Link to={PathConstants.PROFILE}>Profile</Link>
                 </li>
                 <li className="nav-item">
-                  <button className="btn btn-secondary" onClick={logout}>Logout</button>
+                  <button className="btn btn-secondary" onClick={handleSubmit}>Logout</button>
                 </li>
               </>
             ) : (

@@ -26,8 +26,7 @@ const RegisterPage = () => {
       await register(email, password, name);
       navigate('/login')
     } catch (err) {
-      console.log(err)
-      setError('Failed to create an account ' + err,);
+      setError(err.message);
     }
   };
 

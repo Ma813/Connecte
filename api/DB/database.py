@@ -65,7 +65,7 @@ def createPlayer():
         da.session.add(pl)
         da.session.commit()
 
-        return {'message': f'Added {usern} to database'}
+        return {'message': f'Added to database'}
     except Exception as e:
         return {'message': str(e)}
     
@@ -114,9 +114,21 @@ def registerGame(gameBoard, players, winner):
 
 def userExists(usern):
     user = PLAYERS.query.filter_by(username=usern).first()
-
     return user
 
+@datab.route('/stats', methods=['POST'])
+def getuserData():
+    data = request.get_json()
+    if data['token'] == None or checkToken(data['token']) == None:
+        return {'error': "Authentication failure"}
+    user = checkToken(data['token'])
+    username = user.username
+    email = user.email
+    winCount = PLAYERS_GAMES.query.filter_by(FKplayer=username,WDL = 'W').count()
+    drawCount = PLAYERS_GAMES.query.filter_by(FKplayer=username,WDL = 'D').count()
+    loseCount = PLAYERS_GAMES.query.filter_by(FKplayer=username,WDL = 'L').count()
+    data = {'username':username,'email':email,'winCount':winCount,'drawCount':drawCount,'loseCount':loseCount}
+    return {'message':data}
 
 @datab.route('/checkUser', methods=['POST'])
 def checkUser():

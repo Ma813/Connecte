@@ -23,8 +23,8 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
-
-
+  
+  
   const login =  async  (username, password) => {
     const userData = {
       username: username,
@@ -33,8 +33,8 @@ export const AuthProvider = ({ children }) => {
 
     console.log(userData);
 
-    try {
-      const response = await fetch('http://'+window.location.hostname+':5000/checkUser', {
+    
+    const response = await fetch('http://'+window.location.hostname+':5000/checkUser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -43,20 +43,26 @@ export const AuthProvider = ({ children }) => {
       });
 
       const responseData = await response.json();
+      if(responseData.token === undefined)throw Error(responseData.message);
       setCookie('token',responseData.token)
       setIsAuthenticated(true);
-    } catch (error) {
-      setError('Error creating player:', error);
-      console.log(error);
-    }
+    
    
 
   };
 
   const logout = () => {
     // Clear user session, e.g., removing token
+    setCookie('token',null)
     setIsAuthenticated(false);
     setUser(null);
+    
+
+  };
+
+  const CheckIfAuthenticated = () => {
+    if(getCookie('token') !== null) setIsAuthenticated(true)
+
   };
 
   const register = async (email, pass, username) => {
@@ -66,7 +72,7 @@ export const AuthProvider = ({ children }) => {
       email: email,
     };
 
-    try {
+  
       const response = await fetch('http://' + window.location.hostname + ':5000/registerPlayer', {
         method: 'POST',
         headers: {
@@ -76,17 +82,11 @@ export const AuthProvider = ({ children }) => {
       });
 
       const responseData = await response.json();
-      
-      
-    } catch (error) {
-      setError('Error creating player:', error);
-    }
-
-
+      if(responseData.message !== 'Added to database') throw Error(responseData.message)
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, register }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, register,CheckIfAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );
