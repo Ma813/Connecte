@@ -5,6 +5,7 @@ import random
 import time
 from Connect4.connect4 import Connect4
 from extensions import cors, socketio
+from DB.database import registerGame, createGuestPlayer, userExists, generateId, checkToken
 
 
 
@@ -14,16 +15,11 @@ room = Blueprint(name="room", import_name=__name__)
 
 @room.route("/getRoom", methods=["GET"], strict_slashes=False)
 def getRoom():
-    gameId =generateId(8)
+    gameId = generateId(8)
     games[gameId] = [time.time(),Connect4()]
 
     return {'gameId':gameId}
 
-
-
-def generateId(lenght):
-    characters = "qwertyuiopasdfghjklzxcvbnm123456789"
-    return "".join(random.sample(characters,lenght))
 
 @socketio.on('join')
 def handleJoin(data): 
@@ -43,16 +39,19 @@ def handleJoin(data):
             join_room(gameId)
             emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0] }, room=gameId)
             return
-        print(data['id'])
         if(data['id'] == None):
             id = generateId(15)
         else:
             id = data['id']
-        
-        games[gameId][1].addPlayer(request.sid,id)
-        games[gameId][0] = time.time()    
+        print(data)
+        if(checkToken(data['token']) != None):
+            token = data['token']
+        else:
+            token = -1
+        games[gameId][1].addPlayer(request.sid,id,token)
+        games[gameId][0]=time.time()    
         print(id)
-        emit('cookie',{'id':id})
+        emit('cookie',{'id':id}, room=request.sid)
         join_room(gameId)
         emit('message',{'state':'waiting_for_one_player'})
         if(games[gameId][1].state == 1):
@@ -61,9 +60,11 @@ def handleJoin(data):
         return
     emit('message',{'state':'no_room_found'})
 
+
 @socketio.on('move')
 def handleMove(data): 
     try:
+        print(data)
         gameId = data['gameId']
         game = games[gameId][1]
         move = int(data['move'])
@@ -74,7 +75,9 @@ def handleMove(data):
         return
 
     if(game.checkForWin()):
-        emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':False , 'draw':False}, room=gameId)
+        data = registerGame(game.getBoardString(), games[gameId][1].players, games[gameId][1].toMove[1])
+        error= data['message']
+        emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':False , 'draw':False, 'error':error}, room=gameId)
         emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':True , 'draw':False}, room=games[gameId][1].toMove[1])
         game.changeState()
         return

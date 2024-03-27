@@ -3,12 +3,11 @@ import random
 
 
 class Connect4:
- 
     def __init__(self, h=6, w=7, k=4,playerCount = 2):
         self.h = h
         self.w = w
         self.k = k
-        self.toMove = [-1, -1, -1]
+        self.toMove = [-1, -1, -1, -1]
         self.players = []
         self.playerCount = playerCount
         self.state = 0
@@ -37,7 +36,7 @@ class Connect4:
     # returns true if placing a tile was successful
     def placeTile(self, row):
         if int(row) not in self.legalMoves():
-            raise Exceoption("Not a legal move")
+            raise Exception("Not a legal move")
         for i in range(self.h):
             if self.board[self.h - 1 - i][row] == 0:
                 self.board[self.h - 1 - i][row] = self.toMove[0]
@@ -76,12 +75,13 @@ class Connect4:
                     return True
         return False
 
-    def addPlayer(self, requestid,id):
+    def addPlayer(self, requestid,id,token):
         playerNumber = len(self.players)
-        self.players.append([playerNumber + 1, requestid, id])
+        self.players.append([playerNumber + 1, requestid, id,token])
         if len(self.players) == self.playerCount:
             self.changeState()
             return
+        print(self.players)
 
     def changeToMove(self):
         toMoveIndex = self.players.index(self.toMove) + 1

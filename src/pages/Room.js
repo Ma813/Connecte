@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, createBrowserRouter } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 import io from 'socket.io-client';
 import '../styles/Default.css'
 import '../styles/Connect4Board.css'
 import GameEnd from './Game/GameEnd';
 import DrawBoard from './Game/DrawBoard'
 
+const cookies = new Cookies(null, { path: '/' });
+
+const setCookie = (name,value) => {
+  let d = new Date();
+  d.setTime(d.getTime() + (60*24*60*1000));
+  cookies.set(name, value, {path: "/", expires: d});
+};
+
+function getCookie(name) {
+  let cookie = cookies.get(name)
+  if(cookie  === undefined)return null;
+  return cookie 
+
+};
 
 const Room = () => {
   const { gameId } = useParams();
@@ -17,6 +32,7 @@ const Room = () => {
   const [draw, setDraw] = useState(false);
   const [gameState, setGameState] = useState('loading');
   const [color, setColor] = useState(null);
+  
 
   const navigate = useNavigate();
 
@@ -24,12 +40,6 @@ const Room = () => {
   .map(i => new Array(7).fill(null));
 
   const fullURL = window.location.href;
-
-  function getCookie(name) {
-    function escape(s) { return s.replace(/([.*+?\^$(){}|\[\]\/\\])/g, '\\$1'); }
-    var match = document.cookie.match(RegExp('(?:^|;\\s*)' + escape(name) + '=([^;]*)'));
-    return match ? match[1] : null;
-}
 
   useEffect(() => {
 
@@ -39,13 +49,12 @@ const Room = () => {
 
     newSocket.on('connect', () => {
       
-      newSocket.emit('join', { 'gameId': gameId, 'id':getCookie('id') });
+      newSocket.emit('join', { 'gameId': gameId, 'id':getCookie('id'), 'token':getCookie('token')});
       
     });
     
     newSocket.on('cookie', (data) => {
-      document.cookie = 'id='+data['id'];
-
+      setCookie('id',data['id']);
     });
 
     newSocket.on('message', (data) => {
