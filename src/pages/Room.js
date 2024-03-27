@@ -7,6 +7,7 @@ import '../styles/Connect4Board.css'
 import GameEnd from './Game/GameEnd';
 import DrawBoard from './Game/DrawBoard'
 
+
 const cookies = new Cookies(null, { path: '/' });
 
 const setCookie = (name,value) => {

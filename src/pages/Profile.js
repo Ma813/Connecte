@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Cookies from 'universal-cookie';
+import path from '../Path'
 
 const cookies = new Cookies(null, { path: '/' });
 
@@ -32,7 +33,7 @@ const ProfilePage = () => {
   const userData = {
       token: getCookie('token'),
     };
-  const response = await fetch('http://' + window.location.hostname + ':5000/stats', {
+  const response = await fetch(path+'/stats', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

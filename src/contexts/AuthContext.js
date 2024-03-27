@@ -1,7 +1,7 @@
 // src/contexts/AuthContext.js
 import React, { createContext, useContext, useState } from 'react';
 import Cookies from 'universal-cookie';
-
+import path from '../Path'
 
 const AuthContext = createContext(null);
 
@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
     console.log(userData);
 
     
-    const response = await fetch('http://'+window.location.hostname+':5000/checkUser', {
+    const response = await fetch(path + '/checkUser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }) => {
     };
 
   
-      const response = await fetch('http://' + window.location.hostname + ':5000/registerPlayer', {
+      const response = await fetch(path +'/registerPlayer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
