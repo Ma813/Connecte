@@ -99,7 +99,6 @@ def createPlayer():
 
 def checkToken(token):
     if token is not None:
-        print(token)
         return sql_functions.select("username, hashed_pass, email, token", "PLAYERS", f"token = '{token}'").first()
     return None
 
@@ -127,7 +126,6 @@ def registerGame(gameBoard, players, winner):
             wdl = 'L'
 
         if player[3] != -1:
-            print(sql_functions.select("username, hashed_pass, email, token", "PLAYERS", f"token = '{player[3]}'").first())
             pl = sql_functions.select("username, hashed_pass, email, token", "PLAYERS", f"token = '{player[3]}'").first().username
         else:
             pl = "Guest"
