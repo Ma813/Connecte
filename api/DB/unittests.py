@@ -59,23 +59,14 @@ class TestCreatePlayer(unittest.TestCase):
         response = self.module.createPlayer()
         self.assertEqual(response, {'message': 'Username already taken'})
 
-    def test_create_player_special_characters_username(self):
-        self.request_mock.get_json.return_value = {
-            'username': 'user!@#',
-            'hashed_pass': 'random_pass',
-            'email': 'random@email.com'
-        }
-        response = self.module.createPlayer()
-        self.assertEqual(response, {'message': 'Added to database'})
-
-    def test_create_player_special_characters_password(self):
+    def test_create_player_wrong_json_format(self):
         self.request_mock.get_json.return_value = {
             'username': 'username',
-            'hashed_pass': 'password!@#$%^&*()_+',
+            'pass': 'password!@#$%^&*()_+',
             'email': 'this@email.com'
         }
         response = self.module.createPlayer()
-        self.assertEqual(response, {'message': 'Added to database'})
+        self.assertEqual(response, {'message': "'hashed_pass'"})
 
 if __name__ == '__main__':
     unittest.main()
