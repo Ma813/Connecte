@@ -7,13 +7,13 @@ class Connect4:
         self.h = h
         self.w = w
         self.k = k
-        self.toMove = [-1, -1, -1, -1]
+        self.toMove = [-1, -1, -1, -1] # color, requestID, cookie, token
         self.players = []
         self.playerCount = playerCount
         self.state = 0
         self.board = np.zeros((h, w))
 
-    def getState():
+    def getState(self):
         return self.state
 
     def getBoardString(self):
@@ -41,38 +41,41 @@ class Connect4:
             if self.board[self.h - 1 - i][row] == 0:
                 self.board[self.h - 1 - i][row] = self.toMove[0]
                 return True
-        return False
 
     # returns true if there are any k connected tiles on the board otherwise returns false
     def checkForWin(self):
-        for c in range(self.w - 3):
+        color = self.toMove[0]
+        for c in range(self.w - self.k + 1):
             for r in range(self.h):
-                if self.board[r][c] == self.toMove[0] and self.board[r][
-                    c + 1] == self.toMove[0] and self.board[r][
-                    c + 2] == self.toMove[0] and self.board[r][
-                    c + 3] == self.toMove[0]:
-                    return True
+                for i in range(self.k):
+                    if self.board[r][c + i] != color:
+                        break
+                    if i == self.k - 1:
+                        return True
+                    
         for c in range(self.w):
-            for r in range(self.h - 3):
-                if self.board[r][c] == self.toMove[0] and self.board[r + 1][
-                    c] == self.toMove[0] and self.board[r + 2][
-                    c] == self.toMove[0] and self.board[r + 3][
-                    c] == self.toMove[0]:
-                    return True
-        for c in range(self.w - 3):
-            for r in range(self.h - 3):
-                if self.board[r][c] == self.toMove[0] and self.board[r + 1][
-                    c + 1] == self.toMove[0] and self.board[r + 2][
-                    c + 2] == self.toMove[0] and self.board[r + 3][
-                    c + 3] == self.toMove[0]:
-                    return True
-        for c in range(self.w - 3):
-            for r in range(3, self.h):
-                if self.board[r][c] == self.toMove[0] and self.board[r - 1][
-                    c + 1] == self.toMove[0] and self.board[r - 2][
-                    c + 2] == self.toMove[0] and self.board[r - 3][
-                    c + 3] == self.toMove[0]:
-                    return True
+            for r in range(self.h - self.k + 1):
+                for i in range(self.k):
+                    if self.board[r + i][c] != color:
+                        break
+                    if i == self.k - 1:
+                        return True
+        
+        for c in range(self.w - self.k + 1):
+            for r in range(self.h - self.k + 1):
+                for i in range(self.k):
+                    if self.board[r + i][c + i] != color:
+                        break
+                    if i == self.k - 1:
+                        return True
+                    
+        for c in range(self.w - self.k + 1):
+            for r in range(self.k - 1, self.h):
+                for i in range(self.k):
+                    if self.board[r - i][c + i] != color:
+                        break
+                    if i == self.k - 1:
+                        return True
         return False
 
     def addPlayer(self, requestid,id,token):
