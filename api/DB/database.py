@@ -39,7 +39,7 @@ class sqlFunctions:
         self.database.session.commit()
 
 
-sql_functions = sqlFunctions(da.session)
+sql_functions = sqlFunctions(da)
 class PLAYERS(da.Model):
     __tablename__ = 'connecte.PLAYERS'
     username = da.Column(da.String(50), primary_key=True)
