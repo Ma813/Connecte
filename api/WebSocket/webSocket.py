@@ -3,6 +3,7 @@ from flask_socketio import emit, join_room, leave_room, rooms
 from threading import Thread
 import random
 import time
+import json
 from Connect4.connect4 import Connect4
 from extensions import cors, socketio
 from DB.database import registerGame, generateId, checkToken
@@ -23,7 +24,8 @@ def getRoom():
 
 @socketio.on('join')
 def handleJoin(data): 
-    if 'gameId' not in data:
+    if 'gameId' not in data or 'id' not in data or 'token' not in data:
+        emit('error',{'state':'no_room_found'})
         return
     gameId = data['gameId']
     if gameId in games:
@@ -43,14 +45,12 @@ def handleJoin(data):
             id = generateId(15)
         else:
             id = data['id']
-        print(data)
         if(checkToken(data['token']) != None):
             token = data['token']
         else:
             token = -1
         games[gameId][1].addPlayer(request.sid,id,token)
         games[gameId][0]=time.time()    
-        print(id)
         emit('cookie',{'id':id}, room=request.sid)
         join_room(gameId)
         emit('message',{'state':'waiting_for_one_player'})
@@ -58,13 +58,12 @@ def handleJoin(data):
             emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0]}, room=gameId)
             emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'color':games[gameId][1].toMove[0]}, room=games[gameId][1].toMove[1])
         return
-    emit('message',{'state':'no_room_found'})
+    emit('error',{'state':'no_room_found'})
 
 
 @socketio.on('move')
 def handleMove(data): 
     try:
-        print(data)
         gameId = data['gameId']
         game = games[gameId][1]
         move = int(data['move'])
@@ -101,10 +100,10 @@ def handleLeave():
         samebrowser = True
         firstid = games[userRoom][1].players[0][2]
         for x in games[userRoom][1].players:
-            print(x)
+        
             if(x[2] != firstid):
                 samebrowser = False
-        print(samebrowser)
+ 
         if(samebrowser == False):
             time.sleep(15)
         for x in games[userRoom][1].players:

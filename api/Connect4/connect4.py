@@ -81,7 +81,7 @@ class Connect4:
         if len(self.players) == self.playerCount:
             self.changeState()
             return
-        print(self.players)
+    
 
     def changeToMove(self):
         toMoveIndex = self.players.index(self.toMove) + 1

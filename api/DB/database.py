@@ -77,7 +77,7 @@ def checkToken(token):
 
 
 def registerGame(gameBoard, players, winner):
-    print("called")
+
     try:
         game = GAMES(game_board=gameBoard)
         da.session.add(game)
@@ -138,8 +138,6 @@ def checkUser():
         passw = data['hashed_pass']
         
         user = PLAYERS.query.filter_by(username=usern).first()
-        
-        print(type(passw))
         if not user:
             return {'message': 'User not found or Incorrect password'}
         if not bcrypt.checkpw(hmac.new(pepper["Pepper"].encode('utf-8'), passw.encode('utf-8'), hashlib.sha256).hexdigest().encode('utf-8'), str.encode(user.hashed_pass, 'utf-8')):
