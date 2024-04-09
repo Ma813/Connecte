@@ -21,7 +21,6 @@ class TestCreatePlayer(unittest.TestCase):
             'hashed_pass': 'random_pass',
             'email': 'random@email.com'
         }
-        # self.sql_functions_mock.select.return_value.first.return_value = None
         response = self.module.createPlayer()
         self.assertEqual(response, {'message': 'Added to database'})
 
@@ -31,7 +30,6 @@ class TestCreatePlayer(unittest.TestCase):
             'hashed_pass': 'random_pass',
             'email': 'random@email.com'
         }
-        # self.sql_functions_mock.select.return_value.first.return_value = None
         response = self.module.createPlayer()
         self.assertEqual(response, {'message': 'Added to database'})
 
