@@ -78,6 +78,8 @@ def createPlayer():
             return {'message': 'Username must be at least 5 characters long'}
         if len(passw) < 8:
             return {'message': 'Password must be at least 8 characters long'}
+        if usern.find(" ") != -1:
+            return {'message': 'Username cannot contain spaces'}
 
         # Validate if it is a valid email later
 
@@ -104,7 +106,7 @@ def checkToken(token):
 
 
 def registerGame(gameBoard, players, winner):
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now()
     time = now.strftime('%Y-%m-%d %H:%M:%S')
     sql_functions.insert("GAMES", {"game_board": gameBoard, "time_date": time})
     game = sql_functions.select("*", "GAMES", f"time_date = '{time}'").first()
@@ -118,7 +120,7 @@ def registerGame(gameBoard, players, winner):
         winner = [-1, -1, -1, -1]
 
     for player in players:
-        if (winner[2] == player[2]):
+        if (winner[2] == player[2] and winner[0] == player[0]):
             wdl = 'W'
         elif (draw):
             wdl = 'D'
@@ -151,7 +153,24 @@ def getuserData():
     winCount = len(sql_functions.select("*", "PLAYERS_GAMES", f"FKplayer = '{username}' AND WDL ='W'").all())
     drawCount = len(sql_functions.select("*", "PLAYERS_GAMES", f"FKplayer = '{username}' AND WDL ='D'").all())
     loseCount = len(sql_functions.select("*", "PLAYERS_GAMES", f"FKplayer = '{username}' AND WDL ='L'").all())
-    data = {'username': username, 'email': email, 'winCount': winCount, 'drawCount': drawCount, 'loseCount': loseCount}
+    player_games = sql_functions.select("*", "PLAYERS_GAMES", f"FKplayer = '{username}'").all()
+    
+    games = []
+    
+    for game in player_games:
+        board = sql_functions.select("game_board", "GAMES", f"id = {game.FKgame}").first().game_board
+        time = sql_functions.select("time_date", "GAMES", f"id = {game.FKgame}").first().time_date.strftime('%Y-%m-%d %H:%M:%S')
+        opponentsIDs = sql_functions.select("FKplayer", "PLAYERS_GAMES", f"FKgame = {game.FKgame} AND FKplayer != '{username}'").all()
+        selfCount = len(sql_functions.select("FKplayer", "PLAYERS_GAMES", f"FKgame = {game.FKgame} AND FKplayer = '{username}'").all())
+        opponents = ""
+        if selfCount > 1:
+            opponents = "You " * (selfCount - 1) # If the player played against themselves
+        for opponent in opponentsIDs:
+            opp = opponent.FKplayer
+            opponents += opp + " "
+        games.append({"gameId": game.FKgame, "WDL": game.WDL, "which_turn": game.which_turn, "board": board, "time": time, "opponents": opponents} )
+        
+    data = {'username': username, 'email': email, 'winCount': winCount, 'drawCount': drawCount, 'loseCount': loseCount, 'games': games}
     return {'message': data}
 
 
