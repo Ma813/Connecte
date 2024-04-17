@@ -6,7 +6,7 @@ import time
 import json
 from Connect4.connect4 import Connect4
 from extensions import cors, socketio
-from DB.database import registerGame, generateId, checkToken
+from DB.database import registerGame, generateId, checkToken, getName
 
 
 
@@ -39,29 +39,36 @@ def handleJoin(data):
                 if(data['id'] == x[2]):
                     join_room(gameId)
                     x[1] = request.sid
-                    emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0]}, room=gameId)
-                    emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'color':games[gameId][1].toMove[0]}, room=games[gameId][1].toMove[1])
+                    emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0], 'name':games[gameId][1].toMove[4], 'name':games[gameId][1].toMove[4]}, room=gameId)
+                    emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'color':games[gameId][1].toMove[0], 'name':games[gameId][1].toMove[4]}, room=games[gameId][1].toMove[1])
                     return
 
             join_room(gameId)
-            emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0] }, room=gameId)
+            emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0], 'name':games[gameId][1].toMove[4], 'spectator':True }, room=request.sid)
             return
         if(data['id'] == None):
             id = generateId(15)
         else:
             id = data['id']
-        if(checkToken(data['token']) != None):
+        
+
+        player = checkToken(data['token'])
+        if(player != None):
             token = data['token']
+            name = player[0]
         else:
             token = -1
-        games[gameId][1].addPlayer(request.sid,id,token)
+            name = "Guest"
+
+
+        games[gameId][1].addPlayer(request.sid,id,token,name)
         games[gameId][0]=time.time()    
         emit('cookie',{'id':id}, room=request.sid)
         join_room(gameId)
         emit('message',{'state':'waiting_for_one_player'})
         if(games[gameId][1].state == 1):
-            emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0]}, room=gameId)
-            emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'color':games[gameId][1].toMove[0]}, room=games[gameId][1].toMove[1])
+            emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0], 'name':games[gameId][1].toMove[4]}, room=gameId)
+            emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'color':games[gameId][1].toMove[0], 'name':games[gameId][1].toMove[4]}, room=games[gameId][1].toMove[1])
         return
     emit('error',{'state':'no_room_found'})
 
@@ -75,13 +82,13 @@ def handleMove(data):
         game.placeTile(move)
         
     except:
-        emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'error':'Row already full', 'color':games[gameId][1].toMove[0]}, room=request.sid)
+        emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'error':'Row already full', 'color':games[gameId][1].toMove[0], 'name':games[gameId][1].toMove[4]}, room=request.sid)
         return
 
     if(game.checkForWin()):
         data = registerGame(game.getBoardString(), games[gameId][1].players, games[gameId][1].toMove)
-        emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':False , 'draw':False}, room=gameId)
-        emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':True , 'draw':False}, room=games[gameId][1].toMove[1])
+        emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':False , 'draw':False, 'name':games[gameId][1].toMove[4]}, room=gameId)
+        emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':True , 'draw':False, 'name':games[gameId][1].toMove[4]}, room=games[gameId][1].toMove[1])
         game.changeState()
         return
 
@@ -92,9 +99,9 @@ def handleMove(data):
         return
 
     game.changeToMove()
-    emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0]}, room=gameId)
-    emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'color':games[gameId][1].toMove[0]}, room=games[gameId][1].toMove[1])
-    print(games[gameId][1].toMove[0])
+    emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0], 'name':games[gameId][1].toMove[4]}, room=gameId)
+    emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'color':games[gameId][1].toMove[0], 'name':games[gameId][1].toMove[4]}, room=games[gameId][1].toMove[1])
+
     return
                         
     

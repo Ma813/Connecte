@@ -33,7 +33,8 @@ const Room = () => {
   const [draw, setDraw] = useState(false);
   const [gameState, setGameState] = useState('loading');
   const [color, setColor] = useState(null);
-  
+  const [spectator, setSpectator] = useState(false);
+  const [Username,setUsername] = useState(null);
 
   const navigate = useNavigate();
 
@@ -65,7 +66,12 @@ const Room = () => {
       if (state == 'playing_game') {
         setBoard(data['board']);
         setMove(data['move']);
+        setUsername(data['name']);
         setColor(data['color'])
+        if('spectator' in data)
+        {
+          setSpectator(data['spectator'])
+        }
         if ('error' in data) {
           setError(data['error'])
         }
@@ -77,6 +83,7 @@ const Room = () => {
         setBoard(data['board']);
         setMove(data['move']);
         setWin(data['winner'])
+        setUsername(data['name'])
         setDraw(data['draw'])
         if ('error' in data) {
           setError(data['error'])
@@ -123,13 +130,13 @@ const Room = () => {
 
 
   const renderPlayingGame = () => (
-    <DrawBoard board={board} boardString={boardString} move = {move} color = {color} MakeMove = {MakeMove} error = {error} GameEnd = {false}/>
+    <DrawBoard board={board} boardString={boardString} move = {move} spectator={spectator} name={Username} color = {color} MakeMove = {MakeMove} error = {error} GameEnd = {false}/>
   );
 
   const renderGameEnd = () => (
     <div>
-      <DrawBoard board={board} boardString={boardString} move = {false} color = {color} MakeMove = {MakeMove} error = {error} GameEnd = {true}/>
-      <GameEnd draw={draw} win={win} error={error} onRestart={() => window.location.reload()} onHome={() => navigate("/")}/>
+      <DrawBoard board={board} boardString={boardString} move = {false} spectator={spectator} name={Username} color = {color} MakeMove = {MakeMove} error = {error} spr GameEnd = {true}/>
+      <GameEnd draw={draw} win={win} error={error} spectator={spectator} name={Username} onRestart={() => window.location.reload()} onHome={() => navigate("/")}/>
     </div>
   );  
   const renderLoading = () => (
