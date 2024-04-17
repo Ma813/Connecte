@@ -1,0 +1,21 @@
+.profile-connect4-board {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-row {
+    display:flex;
+    margin-bottom: -35px;
+}
+
+.profile-circle {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    margin: 1px;
+    flex-shrink: 0; /* Prevents the flex container from shrinking the items */
+    flex-grow: 0; /* Prevents the flex container from growing the items */
+    flex-basis: auto; /* Resets the default size of an element based on its content or specified size */
+}
