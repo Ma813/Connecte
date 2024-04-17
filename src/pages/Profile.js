@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Cookies from 'universal-cookie';
 import path from '../Path'
+import BarChart from '../components/BarChart';
 
 const cookies = new Cookies(null, { path: '/' });
 
@@ -21,7 +22,7 @@ const ProfilePage = () => {
   const [games, setGames] = useState([{}]);
   const [gameTable, setGameTable] = useState({});
   const colors = ['red', 'yellow', 'TBD', 'TBD'];
-
+  const [chartData, setChartData] = useState(null);
   const { isAuthenticated } = useAuth(); // Assuming 'user' contains the logged-in user's details
 
 
@@ -53,8 +54,19 @@ const ProfilePage = () => {
     setDrawCount(data.drawCount)
     setLoseCount(data.loseCount)
     setGames(data.games)
+    setChartData({
+      labels: ['Wins', 'Draws', 'Losses'],
+      datasets: [
+        {
+          label: 'Games',
+          data: [data.winCount, data.drawCount, data.loseCount],
+          backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(153, 102, 255, 0.6)'],
+          borderWidth: 4
+        }
+      ]
+    });
   }
-
+  
   //TODO: Make this into a nice table
   const renderGamesTable = (games) => {
     console.log(games)
@@ -87,11 +99,14 @@ const ProfilePage = () => {
 
           if (!loaded) {
             console.log("loading...")
-    handleSubmit()
+          handleSubmit()
           setLoaded(true)
   }
           return (
+            
+
           <div className="container mt-5 text-light p-4 rounded">
+            <canvas id="chartID"></canvas>
             <h2 className="text-center mb-4">Profile Information</h2>
             <div className="row justify-content-center">
               <div className="col-12 col-md-8 text-md-left text-center">
@@ -102,6 +117,9 @@ const ProfilePage = () => {
                 <p><strong>Draw count:</strong> {drawCount}</p>
                 <p><strong>Lose count:</strong> {loseCount}</p>
                 {renderGamesTable(games)}
+                <div className='Chart'>
+                {chartData && <BarChart chartData={chartData} />}
+                </div>
               </div>
             </div>
           </div>
