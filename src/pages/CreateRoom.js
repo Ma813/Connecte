@@ -8,7 +8,8 @@ const GameRoom = () => {
     const [roomId, setRoomId] = useState('');
     const navigate = useNavigate();
     const [inputValue, setInputValue] = useState('');
-    
+    const [gameMode, setGameMode] = useState(1);
+	
 
     const createRoom = () => {
         fetch(path+'/getRoom')
@@ -22,6 +23,7 @@ const GameRoom = () => {
                 console.error('Error fetching data:', error);
             });
     };
+	
 
     useEffect(() => {
     if (roomId !== '') {
@@ -30,8 +32,32 @@ const GameRoom = () => {
     }, [roomId]);
 
     const handleCreateRoomClick = () => {
-        createRoom();
+		register();
     };
+	
+	const handleSubmit = () => {
+        register();
+    };
+	
+	const register = async () => {
+    const userData = {
+      mode: gameMode
+    };
+
+  
+      const response = await fetch(path +'/getRoom', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userData)
+      });
+
+      const responseData = await response.json();
+      if(responseData.error === 'Gamemode does not exist') throw Error(responseData.error)
+	  setRoomId(responseData.gameId);
+      navigate(`/room/${responseData.gameId}`);
+  };
 
     const handleJoinRoomClick = () => {
         if (inputValue !== '')
@@ -56,6 +82,12 @@ const GameRoom = () => {
     return (
         <div>
             <div><button className='roomUIelement' onClick={handleCreateRoomClick}>Create Game Room</button></div>
+			<form onSubmit={handleSubmit}>
+			<div><input onChange={() => setGameMode(1)} type="radio" id="standardGameCheck" name="standardGameCheck" value="standardGame" checked="checked"></input>
+			<label for="standardGameCheck"> Standard game</label></div>
+			<div><input onChange={() => setGameMode(2)} type="radio" id="memoryGameCheck" name="standardGameCheck" value="memoryGame"></input>
+			<label for="memoryGameCheck"> Memory Game</label></div>
+			</form>
             <div><input id='roomIdInput' className='roomUIelement' type="text" value={inputValue} onChange={handleChange} placeholder='Input Room ID'></input></div>
             <div><button className='roomUIelement' onClick={handleJoinRoomClick}>Join Game Room</button></div>
         </div>
