@@ -3,7 +3,7 @@ import random
 
 
 class Connect4:
-    def __init__(self, h=6, w=7, k=4,playerCount = 2):
+    def __init__(self, h=6, w=7, k=4, playerCount=2, gameMode = 1):
         self.h = h
         self.w = w
         self.k = k
@@ -12,13 +12,28 @@ class Connect4:
         self.playerCount = playerCount
         self.state = 0
         self.board = np.zeros((h, w))
+        self.gameMode = gameMode
 
     def getState(self):
         return self.state
 
-    def getBoardString(self):
-        return np.array2string(self.board)
+    def changeMode(self):
+        self.mode = 1
 
+    def getBoardString(self):
+        if self.gameMode == 1:
+            return np.array2string(self.board)
+        else:
+            return np.array2string(self.singleColor())
+
+    def singleColor(self):
+        newBoard = np.zeros((self.h, self.w))
+        for x in range (0, self.h):
+            for y in range (0, self.w):
+                if self.board[x][y] != 0:
+                    newBoard[x][y] = 5
+
+        return newBoard
     # returns all legal moves
     def legalMoves(self):
         moves = []
@@ -78,9 +93,9 @@ class Connect4:
                         return True
         return False
 
-    def addPlayer(self, requestid,id,token):
+    def addPlayer(self, requestid, id, token):
         playerNumber = len(self.players)
-        self.players.append([playerNumber + 1, requestid, id,token])
+        self.players.append([playerNumber + 1, requestid, id, token])
         if len(self.players) == self.playerCount:
             self.changeState()
             return
@@ -88,7 +103,7 @@ class Connect4:
 
     def changeToMove(self):
         toMoveIndex = self.players.index(self.toMove) + 1
-        if(toMoveIndex == len(self.players)):
+        if (toMoveIndex == len(self.players)):
             toMoveIndex = 0
         self.toMove = self.players[toMoveIndex]
 

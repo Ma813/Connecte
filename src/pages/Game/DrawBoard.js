@@ -8,6 +8,7 @@ const colors = {
     '2': 'rgb(255,255,0)',
     '3': 'rgb(0,0,255)',
     '4': 'rgb(0,255,0)',
+	'5': 'rgb(193,77,37)',
     '0': 'rgb(255,255,255)'
 }
 
@@ -21,7 +22,7 @@ const DrawBoard = ({ board, boardString, move, color, MakeMove, error, gameEnd }
     }
 
     const cleanedString = () => {
-        return reversedString().replace(/[^0-2]/g, '');
+        return reversedString().replace(/[^0-9]/g, '');
     }
 
     const handleCellClick = (event, column) => {

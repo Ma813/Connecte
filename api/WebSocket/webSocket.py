@@ -14,10 +14,15 @@ games = {}
 
 room = Blueprint(name="room", import_name=__name__)
 
-@room.route("/getRoom", methods=["GET"], strict_slashes=False)
+@room.route("/getRoom", methods=["POST"], strict_slashes=False)
 def getRoom():
+    data = request.get_json()
     gameId = generateId(8)
-    games[gameId] = [time.time(),Connect4()]
+    print(data)
+    if data['mode'] == 2:
+        games[gameId] = [time.time(),Connect4(gameMode=2)]
+    else:
+        games[gameId] = [time.time(),Connect4()]
 
     return {'gameId':gameId}
 
@@ -89,6 +94,7 @@ def handleMove(data):
     game.changeToMove()
     emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':False, 'color':games[gameId][1].toMove[0]}, room=gameId)
     emit('message',{'state':'playing_game','board':games[gameId][1].getBoardString(), 'move':True, 'color':games[gameId][1].toMove[0]}, room=games[gameId][1].toMove[1])
+    print(games[gameId][1].toMove[0])
     return
                         
     
