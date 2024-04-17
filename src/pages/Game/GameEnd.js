@@ -36,7 +36,6 @@ const GameEnd = ({ draw, win, onRestart, onHome, error,name,spectator}) => {
             )
             }
             <p className='error'>{error}</p>
-            <button onClick={onRestart}>Play Again</button>
             <button onClick={onHome}>Home</button>
           </div>
         </div>
