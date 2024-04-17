@@ -15,7 +15,8 @@ const colors = {
 
 
 
-const DrawBoard = ({ board, boardString, move, color, MakeMove, error, gameEnd }) => {
+const DrawBoard = ({ board, boardString, move, color, MakeMove, error, gameEnd,spectator,name }) => {
+    console.log(spectator)
     const reversedString = () => {
         return '[' + boardString.match(/\[([^[\]]*)\]/g).reverse().join(',') + ']';
     }
@@ -55,14 +56,20 @@ const DrawBoard = ({ board, boardString, move, color, MakeMove, error, gameEnd }
 
         return (
             <div className="connect4-board">
-                {move && (
+                
+                {move && !spectator && (
 
                     <p class="p1">Your turn</p>
 
                 )}
-                {!move && (
+                {!move && !spectator && (
 
                     <p class="p1">Opponents turn</p>
+
+                )}
+                {spectator && (
+
+                    <p class="p1">Users {name} Turn</p>
 
                 )}
                 <div
