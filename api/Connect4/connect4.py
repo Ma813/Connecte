@@ -7,7 +7,7 @@ class Connect4:
         self.h = h
         self.w = w
         self.k = k
-        self.toMove = [-1, -1, -1, -1] # color, requestID, cookie, token
+        self.toMove = [-1, -1, -1, -1, "name"] # color, requestID, cookie, token, username
         self.players = []
         self.playerCount = playerCount
         self.state = 0
@@ -78,9 +78,9 @@ class Connect4:
                         return True
         return False
 
-    def addPlayer(self, requestid,id,token):
+    def addPlayer(self, requestid,id,token,name):
         playerNumber = len(self.players)
-        self.players.append([playerNumber + 1, requestid, id,token])
+        self.players.append([playerNumber + 1, requestid, id,token,name])
         if len(self.players) == self.playerCount:
             self.changeState()
             return

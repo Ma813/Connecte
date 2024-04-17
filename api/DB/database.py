@@ -102,6 +102,10 @@ def checkToken(token):
         return sql_functions.select("username, hashed_pass, email, token", "PLAYERS", f"token = '{token}'").first()
     return None
 
+def getName(token):
+    if token is not None:
+        return sql_functions.select("username, hashed_pass, email, token", "PLAYERS", f"token = '{token}'").first()
+    return "Guest"
 
 def registerGame(gameBoard, players, winner):
     now = datetime.datetime.utcnow()
