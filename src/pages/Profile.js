@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Cookies from 'universal-cookie';
 import path from '../Path'
-import BarChart from '../components/BarChart';
+import PieChart from '../components/PieChart';
 
 const cookies = new Cookies(null, { path: '/' });
 
@@ -116,9 +116,10 @@ const ProfilePage = () => {
                 <p><strong>Win count:</strong> {winCount}</p>
                 <p><strong>Draw count:</strong> {drawCount}</p>
                 <p><strong>Lose count:</strong> {loseCount}</p>
+                {chartData && <PieChart chartData={chartData} />}
                 {renderGamesTable(games)}
                 <div className='Chart'>
-                {chartData && <BarChart chartData={chartData} />}
+                
                 </div>
               </div>
             </div>
