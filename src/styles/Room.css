@@ -1,4 +1,4 @@
-.roomUIelement, .copyButton, .errorMessage{
+.roomUIelement, .copyButton, .errorMessage, .memoryGameCheck{
     width:90%;
     height:100px;
     font-size:100%;
@@ -14,7 +14,18 @@
     font-size:larger;
 }
 
+.select{
+    font-size:x-large;
+    
+}
+
+input[type='radio'] { 
+    transform: scale(2); 
+    margin: 20px;
+}
+
 /*used for notifying the user that the input field is empty */
 .errorMessage::placeholder{
     color:rgba(255, 0, 0, 0.7);;
 }
+

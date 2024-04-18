@@ -8,6 +8,7 @@ const colors = {
     '2': 'rgb(255,255,0)',
     '3': 'rgb(0,0,255)',
     '4': 'rgb(0,255,0)',
+	'5': 'rgb(193,77,37)',
     '0': 'rgb(255,255,255)'
 }
 
@@ -15,13 +16,14 @@ const colors = {
 
 
 
-const DrawBoard = ({ board, boardString, move, color, MakeMove, error, gameEnd }) => {
+const DrawBoard = ({ board, boardString, move, color, MakeMove, error, gameEnd,spectator,name }) => {
+    console.log(spectator)
     const reversedString = () => {
         return '[' + boardString.match(/\[([^[\]]*)\]/g).reverse().join(',') + ']';
     }
 
     const cleanedString = () => {
-        return reversedString().replace(/[^0-2]/g, '');
+        return reversedString().replace(/[^0-9]/g, '');
     }
 
     const handleCellClick = (event, column) => {
@@ -55,14 +57,20 @@ const DrawBoard = ({ board, boardString, move, color, MakeMove, error, gameEnd }
 
         return (
             <div className="connect4-board">
-                {move && (
+                
+                {move && !spectator && (
 
                     <p class="p1">Your turn</p>
 
                 )}
-                {!move && (
+                {!move && !spectator && (
 
                     <p class="p1">Opponents turn</p>
+
+                )}
+                {spectator && (
+
+                    <p class="p1">Users {name} Turn</p>
 
                 )}
                 <div

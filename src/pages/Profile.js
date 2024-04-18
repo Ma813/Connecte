@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Cookies from 'universal-cookie';
 import path from '../Path'
+import BarChart from '../components/BarChart';
+import MiniGameBoard from './MiniGameBoard';
 import PieChart from '../components/PieChart';
 
 const cookies = new Cookies(null, { path: '/' });
@@ -66,10 +68,40 @@ const ProfilePage = () => {
       ]
     });
   }
+
+  function convertBoardStringToArray(boardString) {
+    if (!boardString) {
+        console.error('Invalid or empty board string:', boardString);
+        return []; // Return an empty array as a fallback
+    }
+
+    try {
+      // Step 1: Remove all periods and trim unnecessary whitespace
+      let cleanedString = boardString.replace(/\./g, '').trim();
+
+      let trimedString = cleanedString.substring(1, cleanedString.length-1);
+      
+      // Step 2: Split the string into rows by the newline character
+      let rows = trimedString.split('\n').map(row => row.trim());
+      
+      // Step 3: Remove the outer brackets and split each row into numbers
+      rows = rows.map(row => 
+          row.slice(1, row.length - 1) // Remove the '[' and ']' from each row
+          .trim()
+          .split(/\s+/) // Split the row by one or more spaces
+          .map(Number) // Convert each element from string tmo number
+      );
+
+      return rows;
+  } catch (error) {
+      console.error('Error converting board string to array:', boardString, error);
+      return [];
+  }
+}
   
   //TODO: Make this into a nice table
   const renderGamesTable = (games) => {
-    console.log(games)
+    //console.log(games)
     return (
       <table className="table table-dark table-striped">
         <thead>
@@ -88,10 +120,15 @@ const ProfilePage = () => {
               <td>{game.time}</td>
               <td>{colors[game.which_turn - 1]}</td>
               <td>{game.opponents}</td>
-              <td>{game.board}</td>
-              {/* The last cell should be a button which when clicked shoes the board */}
+              <td>
+              {/* Convert string board to array and render */}
+              {game.board ? <MiniGameBoard board={convertBoardStringToArray(game.board)} /> : <p>No board data</p>}
+            </td>
+            {/*console.log(game.board)*/}
+              {console.log(convertBoardStringToArray(game.board))}
             </tr>
           ))}
+          
         </tbody>
       </table>
     );
