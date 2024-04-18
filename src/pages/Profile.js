@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Cookies from 'universal-cookie';
 import path from '../Path'
-import BarChart from '../components/BarChart';
 import MiniGameBoard from './MiniGameBoard';
 import PieChart from '../components/PieChart';
 
@@ -62,8 +61,7 @@ const ProfilePage = () => {
         {
           label: 'Games',
           data: [data.winCount, data.drawCount, data.loseCount],
-          backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(153, 102, 255, 0.6)'],
-          borderWidth: 4
+
         }
       ]
     });
@@ -153,6 +151,7 @@ const ProfilePage = () => {
                 <p><strong>Win count:</strong> {winCount}</p>
                 <p><strong>Draw count:</strong> {drawCount}</p>
                 <p><strong>Lose count:</strong> {loseCount}</p>
+                <p className='text-center'><strong>WDL chart:</strong></p> 
                 {chartData && <PieChart chartData={chartData} />}
                 {renderGamesTable(games)}
                 <div className='Chart'>
