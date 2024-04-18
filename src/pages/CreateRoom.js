@@ -12,18 +12,7 @@ const GameRoom = () => {
     const [winCondition, setWinCondition] = useState(4);
 
 
-    const createRoom = () => {
-        fetch(path + '/getRoom')
-            .then(response => response.json())
-            .then(data => {
-                // Set the API data to the state variable
-                setRoomId(data.gameId);
-                navigate(`/room/${data.gameId}`);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    };
+
 
 
     useEffect(() => {
@@ -33,11 +22,11 @@ const GameRoom = () => {
     }, [roomId]);
 
     const handleCreateRoomClick = () => {
-        register();
+        createRoom();
     };
 
     const handleSubmit = () => {
-        register();
+        createRoom();
     };
 
     /* CHATBOTAS SAKE KAZKA TOKIO REIKE IDETI
@@ -66,7 +55,7 @@ const register = async () => {
     }
 };
     */
-    const register = async () => {
+    const createRoom = async () => {
         const userData = {
             mode: gameMode
         };
@@ -108,22 +97,24 @@ const register = async () => {
         <div>
             <div><button className='roomUIelement' onClick={handleCreateRoomClick}>Create Game Room</button></div>
             <form onSubmit={handleSubmit}>
-                <div>
+                <div className='select'>
                     <input onChange={() => setGameMode(1)} type="radio" id="standardGameCheck" name="gameMode" value="standardGame" checked={gameMode === 1}></input>
-                    <label htmlFor="standardGameCheck"> Standard game</label>
+                    
+                    <label   htmlFor="standardGameCheck"> Standard game</label>
                 </div>
-                <div>
+                <div className='select'>
                     <input onChange={() => setGameMode(2)} type="radio" id="memoryGameCheck" name="gameMode" value="memoryGame" checked={gameMode === 2}></input>
+                    
                     <label htmlFor="memoryGameCheck"> Memory Game</label>
                 </div>
-                <div>
+                <div className='select'>
                     <label htmlFor="winConditionInput">Number of circles to connect to win:</label>
                     <input
                         id="winConditionInput"
                         type="number"
                         value={winCondition}
                         onChange={e => setWinCondition(parseInt(e.target.value, 10))}
-                        min="3"  // Minimum of 3 to make it reasonable
+                        min="2"  // Minimum of 3 to make it reasonable
                     />
                 </div>
             </form>
