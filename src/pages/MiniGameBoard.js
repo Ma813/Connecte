@@ -3,9 +3,12 @@ import '../styles/ProfileGameBoard.css';
 
 
 const colors = {
-    '1': 'rgb(255,0,0)',    // Player 1
-    '2': 'rgb(255,255,0)',  // Player 2
-    '0': 'rgb(255,255,255)' // Empty slot
+    '1': 'rgb(255,0,0)',
+    '2': 'rgb(255,255,0)',
+    '3': 'rgb(0,0,255)',
+    '4': 'rgb(0,255,0)',
+	'5': 'rgb(255,122,0)',
+    '0': 'rgb(255,255,255)'
 };
 
 const MiniGameBoard = ({ board }) => {
