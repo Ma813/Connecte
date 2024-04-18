@@ -18,7 +18,7 @@ class Connect4:
         return self.state
 
     def changeMode(self):
-        self.mode = 1
+        self.gameMode = 1
 
     def getBoardString(self):
         if self.gameMode == 1:

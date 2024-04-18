@@ -18,7 +18,6 @@ room = Blueprint(name="room", import_name=__name__)
 def getRoom():
     data = request.get_json()
     gameId = generateId(8)
-    print(data)
     if data['mode'] == 2:
         games[gameId] = [time.time(),Connect4(gameMode=2)]
     else:
@@ -86,6 +85,7 @@ def handleMove(data):
         return
 
     if(game.checkForWin()):
+        game.changeMode()
         data = registerGame(game.getBoardString(), games[gameId][1].players, games[gameId][1].toMove)
         emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':False , 'draw':False, 'name':games[gameId][1].toMove[4]}, room=gameId)
         emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':True , 'draw':False, 'name':games[gameId][1].toMove[4]}, room=games[gameId][1].toMove[1])
@@ -93,6 +93,7 @@ def handleMove(data):
         return
 
     if(game.checkForDraw()):
+        game.changeMode()
         data = registerGame(game.getBoardString(), games[gameId][1].players, None)
         emit('message',{'state':'game_end','board':games[gameId][1].getBoardString(), 'move':False, 'winner':False , 'draw':True}, room=gameId)
         game.changeState()
@@ -137,5 +138,6 @@ def handleLeave():
            thread = Thread(target = AbandonGame , args = (userRoom,request.sid))
            thread.start()
 
+    games[userRoom][1].changeMode()
     leave_room(userRoom)
 
