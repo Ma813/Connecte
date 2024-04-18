@@ -11,6 +11,7 @@ import random
 import datetime
 import string
 import datetime
+from mail.mail import sendVerifyLink
 
 datab = Blueprint(name="datab", import_name=__name__)
 pepper = json.load(open("config.json"))
@@ -66,6 +67,22 @@ def generateId(lenght, prefix=""):
     return prefix.join(random.choices(string.ascii_lowercase + string.digits, k=lenght))
 
 
+@datab.route('/verify', methods=['POST'])
+def verify():
+    try:
+        data = request.get_json()
+        id = data['id']
+        user = sql_functions.select("username, hashed_pass, email, token", "PLAYERS", f"verifyID = '{id}'").first()
+        if user is None:
+            return {'message': '404 verification link invalid or expired'}
+        sql_functions.update("PLAYERS", {"verified": 1}, f"verifyID = '{id}'")
+        sql_functions.update("PLAYERS", {"verifyID": ""}, f"verifyID = '{id}'")
+        return {'message': f"Thank you for verifying your email {user.username} !"}
+    
+    except Exception as e:
+        return {'message': str(e)}
+
+
 @datab.route('/registerPlayer', methods=['POST'])
 def createPlayer():
     try:
@@ -80,19 +97,27 @@ def createPlayer():
             return {'message': 'Password must be at least 8 characters long'}
         if usern.find(" ") != -1:
             return {'message': 'Username cannot contain spaces'}
-
-        # Validate if it is a valid email later
-
+        if mail.find("@") == -1:
+            return {'message': 'Invalid email'}
+        
         taken = sql_functions.select("username, hashed_pass, email, token", "PLAYERS", f"username = '{usern}'").first()
 
-        if (taken is not None):
+        if taken is not None:
             return {'message': 'Username already taken'}
-
+        
+        existingVerifyID = "notNone"
+        while existingVerifyID is not None:
+            verifyID = generateId(50)
+            existingVerifyID = sql_functions.select("verifyID", "PLAYERS", f"verifyID = '{verifyID}'").first()
+        
+        print("Sending email")
+        sendVerifyLink(mail, verifyID, usern)
+        
         passw = hmac.new(pepper["Pepper"].encode('utf-8'), passw.encode('utf-8'), hashlib.sha256).hexdigest()
         salt = bcrypt.gensalt()
         passw = bcrypt.hashpw(passw.encode('utf-8'), salt)
         passw = passw.decode("utf-8")
-        sql_functions.insert("PLAYERS", {"username": usern, "hashed_pass": passw, "email": mail, "token": ""})
+        sql_functions.insert("PLAYERS", {"username": usern, "hashed_pass": passw, "email": mail, "token": "", "verifyID": verifyID,})
 
         return {'message': 'Added to database'}
     except Exception as e:

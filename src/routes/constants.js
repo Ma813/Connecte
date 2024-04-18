@@ -4,7 +4,8 @@ const PathConstants = {
     LOGIN:"login",
     ROOM:"room/:gameId",
     REGISTER:"register",
-    PROFILE:"profile"
+    PROFILE:"profile",
+    VERIFY:"verify/:verifyID",
 }
 
 export default PathConstants

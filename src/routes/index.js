@@ -8,6 +8,7 @@ const Room = React.lazy(() => import("../pages/Room"))
 const PROFILE = React.lazy(() => import("../pages/Profile"))
 const REGISTER = React.lazy(() => import("../pages/RegisterPage"))
 const LOGIN = React.lazy(() => import("../pages/LoginPage"))
+const VERIFY = React.lazy(() => import("../pages/Verify"))
 const routes = [
     { path: PathConstants.ABOUT, element: <About /> },
     { path: PathConstants.CREATEROOM, element: <CreateRoom /> },
@@ -15,5 +16,6 @@ const routes = [
     { path: PathConstants.PROFILE, element: <PROFILE /> },
     { path: PathConstants.REGISTER, element: <REGISTER /> },
     { path: PathConstants.LOGIN, element: <LOGIN /> },
+    { path: PathConstants.VERIFY, element: <VERIFY /> },
 ]
 export default routes
