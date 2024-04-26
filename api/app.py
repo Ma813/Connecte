@@ -1,9 +1,10 @@
 import time
 import random
 from flask import Flask, Response, request
-from extensions import cors, socketio, da
+from extensions import cors, socketio, da, mail
 from WebSocket.webSocket import room
 from DB.database import datab
+from mail.mail import emailer
 import config
 
 def create_app(config=""):
@@ -23,10 +24,12 @@ def register_extensions(app):
     )
     socketio.init_app(app, cors_allowed_origins="*")
     da.init_app(app)
+    mail.init_app(app)
 
 def register_blueprints(app):
     app.register_blueprint(room)
     app.register_blueprint(datab)
+    app.register_blueprint(emailer)
    
 
 app = create_app(config)
