@@ -9,8 +9,7 @@ import datetime
 emailer = Blueprint(name="email", import_name=__name__)
 
 def sendVerifyLink(email, verificationID, username):
-    print(email)
-    msg = Message('Verify your Connectė account email', sender = 'game.connecte@gmail.com', recipients = [email])
+    msg = Message('Verify your Connectė account email', sender = 'Connectė', recipients = [email])
     body = f'''
     Hello, {username}!
     
@@ -24,3 +23,19 @@ def sendVerifyLink(email, verificationID, username):
     
     mail.send(msg)
 
+
+def sendNewPassword(email, password, username):
+    '''This method sends a new password to the user with a specific email and username'''
+    msg = Message('Your new Connectė account password', sender = 'Connectė', recipients = [email])
+    body = f'''
+    Hello, {username}!
+    
+    Your Connectė account password has been reset. Your new password is:
+    
+    {password}
+    
+    We recommend changing it, however, the feature to change your password is expected to come in a later update to the game. Expected date for update is May 16th.
+    '''
+    msg.body = body
+    
+    mail.send(msg)

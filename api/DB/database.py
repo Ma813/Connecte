@@ -12,6 +12,7 @@ import datetime
 import string
 import datetime
 from mail.mail import sendVerifyLink
+from mail.mail import sendNewPassword
 
 datab = Blueprint(name="datab", import_name=__name__)
 pepper = json.load(open("config.json"))
@@ -47,6 +48,7 @@ class PLAYERS(da.Model):
     token = da.Column(da.String(255))
     hashed_pass = da.Column(da.String(255))
     email = da.Column(da.String(255))
+    verified = da.Column(da.Integer)
 
 
 class GAMES(da.Model):
@@ -223,3 +225,35 @@ def checkUser():
     except Exception as e:
         return {'message': str(e)}
 
+@datab.route('/resetPassword', methods=['POST'])
+def resetPass():
+    '''This method finds username specified in the request,
+    checks if that user is verified.
+    If user is verified, a new password is sent to their email.
+    If not, an error message is sent to the client'''
+    try:
+        data = request.get_json()
+        username = data['username']
+        
+        user = sql_functions.select("email, verified, username", "PLAYERS", f"username = '{username}'").first()
+
+        if user is None:
+            return {'error': "Username doesn't exist"}
+        if user.verified == 0:
+            return {'error': "User needs to be verified to reset password"}
+        
+        newPassword = generateId(10)
+        
+        passw = hmac.new(pepper["Pepper"].encode('utf-8'), newPassword.encode('utf-8'), hashlib.sha256).hexdigest()
+        salt = bcrypt.gensalt()
+        passw = bcrypt.hashpw(passw.encode('utf-8'), salt)
+        passw = passw.decode("utf-8")
+        
+        sql_functions.update("PLAYERS", {"hashed_pass": passw}, f"username = '{user.username}'")
+        sendNewPassword(user.email, newPassword, user.username)
+        
+        
+        return {'message': "Password reset email sent"}
+        
+    except Exception as e:
+        return {'error': str(e)}
