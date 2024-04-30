@@ -10,7 +10,8 @@ const GameRoom = () => {
     const [inputValue, setInputValue] = useState('');
     const [gameMode, setGameMode] = useState(1);
     const [winCondition, setWinCondition] = useState(4);
-
+    const [botDifficulty, setBotDifficulty] = useState(1);
+    const [Loading, setLoading] = useState(false);
 
 
 
@@ -56,8 +57,10 @@ const register = async () => {
 };
     */
     const createRoom = async () => {
+        setLoading(true);
         const userData = {
-            mode: gameMode
+            mode: gameMode,
+            winCondition: winCondition
         };
 
 
@@ -92,21 +95,55 @@ const register = async () => {
         document.getElementById('roomIdInput').className = 'roomUIelement'
         setInputValue(event.target.value);
     };
-
-    return (
+    
+    const renderLoading = () => (
         <div>
+          <p class = "p1">Loading!</p>
+    
+        </div>
+      );
+    if(Loading){
+        return renderLoading
+    }
+    else{
+    return (
+       
+        <div>
+            
             <div><button className='roomUIelement' onClick={handleCreateRoomClick}>Create Game Room</button></div>
             <form onSubmit={handleSubmit}>
                 <div className='select'>
                     <input onChange={() => setGameMode(1)} type="radio" id="standardGameCheck" name="gameMode" value="standardGame" checked={gameMode === 1}></input>
-                    
-                    <label   htmlFor="standardGameCheck"> Standard game</label>
+
+                    <label htmlFor="standardGameCheck"> Standard game</label>
                 </div>
                 <div className='select'>
                     <input onChange={() => setGameMode(2)} type="radio" id="memoryGameCheck" name="gameMode" value="memoryGame" checked={gameMode === 2}></input>
-                    
+
                     <label htmlFor="memoryGameCheck"> Memory Game</label>
                 </div>
+                <div className='select'>
+                    <input onChange={() => setGameMode(3)} type="radio" id="botGameCheck" name="gameMode" value="botGame" checked={gameMode === 3}></input>
+                    <label htmlFor="botGameCheck"> Bot Game</label>
+                    {gameMode === 3 && (
+                        <div>
+                            <label htmlFor="botDifficultySlider">Bot Difficulty:</label>
+                            <input
+                                id="botDifficultySlider"
+                                type="range"
+                                min="1"
+                                max="10"
+                                value={botDifficulty}
+                                onChange={(e) => setBotDifficulty(parseInt(e.target.value, 10))}
+                                style={{ width: "300px" }} // Optional style to improve visibility
+                            />
+                            <div className="sliderValue">
+                                {botDifficulty} / 10
+                            </div>
+                        </div>
+                    )}
+                </div>
+                
                 <div className='select'>
                     <label htmlFor="winConditionInput">Number of circles to connect to win:</label>
                     <input
@@ -121,9 +158,9 @@ const register = async () => {
             <div><input id='roomIdInput' className='roomUIelement' type="text" value={inputValue} onChange={handleChange} placeholder='Input Room ID'></input></div>
             <div><button className='roomUIelement' onClick={handleJoinRoomClick}>Join Game Room</button></div>
         </div>
-
-
+        
     );
+                    }
 };
 
 export default GameRoom;

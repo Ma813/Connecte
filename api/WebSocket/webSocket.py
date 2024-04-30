@@ -5,8 +5,10 @@ import time
 from flask import Blueprint, request, copy_current_request_context
 from flask_socketio import emit, join_room, leave_room, rooms
 from Connect4.connect4 import Connect4
-from extensions import socketio
-from DB.database import registerGame, generateId, checkToken
+from extensions import cors, socketio
+from DB.database import registerGame, generateId, checkToken, getName
+from Bot.Connect import connectBotToGame
+
 
 
 games = {}
@@ -19,10 +21,17 @@ def getRoom():
     """This method is responsible for creating a new game room"""
     data = request.get_json()
     gameId = generateId(8)
-    if data["mode"] == 2:
-        games[gameId] = [time.time(), Connect4(gameMode=2)]
+    if data['mode'] == 2:
+        games[gameId] = [time.time(),Connect4(gameMode=2)]
+    elif data['mode'] == 3:
+        game = Connect4()
+        games[gameId] = [time.time(),game]
+        connectBotToGame(gameId,7)
+    elif data['winCondition'] >=1:
+        games[gameId] = [time.time(),Connect4(k=data['winCondition'])]
     else:
-        games[gameId] = [time.time(), Connect4()]
+        games[gameId] = [time.time(),Connect4(k=4)]
+
 
     return {"gameId": gameId}
 

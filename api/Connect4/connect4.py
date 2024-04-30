@@ -21,6 +21,7 @@ class Connect4:
         self.state = 0
         self.board = np.zeros((h, w))
         self.gameMode = gameMode
+        
 
     def getState(self):
         '''Get the state of the game'''
@@ -33,9 +34,9 @@ class Connect4:
     def getBoardString(self):
         '''Get the game's board as a string'''
         if self.gameMode == 1:
-            return np.array2string(self.board)
+            return np.array2string(self.board,separator=',')
         else:
-            return np.array2string(self.singleColor())
+            return np.array2string(self.singleColor(),separator=',')
 
     def singleColor(self):
         '''Get the game's board as a string with only one color for every token on the board'''
