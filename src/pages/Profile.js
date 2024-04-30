@@ -75,13 +75,14 @@ const ProfilePage = () => {
 
     try {
       // Step 1: Remove all periods and trim unnecessary whitespace
-      let cleanedString = boardString.replace(/\./g, '').trim();
-
+      console.log(boardString)
+      let cleanedString = boardString.replace(/[\.,]|\./g, ' ').trim();
+      
       let trimedString = cleanedString.substring(1, cleanedString.length-1);
       
       // Step 2: Split the string into rows by the newline character
       let rows = trimedString.split('\n').map(row => row.trim());
-      
+      console.log(rows)
       // Step 3: Remove the outer brackets and split each row into numbers
       rows = rows.map(row => 
           row.slice(1, row.length - 1) // Remove the '[' and ']' from each row
