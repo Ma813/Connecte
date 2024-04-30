@@ -23,8 +23,6 @@ def getRoom():
         games[gameId] = [time.time(),Connect4(gameMode=2)]
     else:
         games[gameId] = [time.time(),Connect4()]
-    print(data['w'])
-    print(data['h'])
     return {'gameId':gameId}
 
 
