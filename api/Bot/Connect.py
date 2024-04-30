@@ -9,13 +9,14 @@ import socketio
 
 def connectBotToGame(link,depth):
     algorithim = AiPlayer(depth)
-    thread = Thread(target = createConnection, args = (link,algorithim))
+    sio = socketio.SimpleClient()
+    sio.connect('http://localhost:5000')
+    thread = Thread(target = createConnection, args = (link,algorithim,sio))
     thread.start()
 
 
-def createConnection(link,algorithim):
-    sio = socketio.SimpleClient()
-    sio.connect('http://localhost:5000')
+def createConnection(link,algorithim,sio):
+
     sio.emit('join', {'gameId': link,'id':"0",'token':"0"})
     
     while(True):

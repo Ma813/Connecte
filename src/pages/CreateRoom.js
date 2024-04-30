@@ -11,7 +11,7 @@ const GameRoom = () => {
     const [gameMode, setGameMode] = useState(1);
     const [winCondition, setWinCondition] = useState(4);
     const [botDifficulty, setBotDifficulty] = useState(1);
-
+    const [Loading, setLoading] = useState(false);
 
 
 
@@ -57,6 +57,7 @@ const register = async () => {
 };
     */
     const createRoom = async () => {
+        setLoading(true);
         const userData = {
             mode: gameMode,
             winCondition: winCondition
@@ -94,9 +95,21 @@ const register = async () => {
         document.getElementById('roomIdInput').className = 'roomUIelement'
         setInputValue(event.target.value);
     };
-
-    return (
+    
+    const renderLoading = () => (
         <div>
+          <p class = "p1">Loading!</p>
+    
+        </div>
+      );
+    if(Loading){
+        return renderLoading
+    }
+    else{
+    return (
+       
+        <div>
+            
             <div><button className='roomUIelement' onClick={handleCreateRoomClick}>Create Game Room</button></div>
             <form onSubmit={handleSubmit}>
                 <div className='select'>
@@ -130,6 +143,7 @@ const register = async () => {
                         </div>
                     )}
                 </div>
+                
                 <div className='select'>
                     <label htmlFor="winConditionInput">Number of circles to connect to win:</label>
                     <input
@@ -144,9 +158,9 @@ const register = async () => {
             <div><input id='roomIdInput' className='roomUIelement' type="text" value={inputValue} onChange={handleChange} placeholder='Input Room ID'></input></div>
             <div><button className='roomUIelement' onClick={handleJoinRoomClick}>Join Game Room</button></div>
         </div>
-
-
+        
     );
+                    }
 };
 
 export default GameRoom;
