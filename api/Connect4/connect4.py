@@ -13,6 +13,7 @@ class Connect4:
         self.state = 0
         self.board = np.zeros((h, w))
         self.gameMode = gameMode
+        
 
     def getState(self):
         return self.state
@@ -22,9 +23,9 @@ class Connect4:
 
     def getBoardString(self):
         if self.gameMode == 1:
-            return np.array2string(self.board)
+            return np.array2string(self.board,separator=',')
         else:
-            return np.array2string(self.singleColor())
+            return np.array2string(self.singleColor(),separator=',')
 
     def singleColor(self):
         newBoard = np.zeros((self.h, self.w))
@@ -92,6 +93,9 @@ class Connect4:
                     if i == self.k - 1:
                         return True
         return False
+
+
+
 
     def addPlayer(self, requestid,id,token,name):
         playerNumber = len(self.players)

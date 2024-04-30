@@ -108,6 +108,11 @@ const register = async () => {
                     <label htmlFor="memoryGameCheck"> Memory Game</label>
                 </div>
                 <div className='select'>
+                    <input onChange={() => setGameMode(3)} type="radio" id="botGameCheck" name="gameMode" value="botGame" checked={gameMode === 3}></input>
+                    
+                    <label htmlFor="botGameCheck"> Bot Game</label>
+                </div>
+                <div className='select'>
                     <label htmlFor="winConditionInput">Number of circles to connect to win:</label>
                     <input
                         id="winConditionInput"

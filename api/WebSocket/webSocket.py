@@ -7,7 +7,7 @@ import json
 from Connect4.connect4 import Connect4
 from extensions import cors, socketio
 from DB.database import registerGame, generateId, checkToken, getName
-
+from Bot.Connect import connectBotToGame
 
 
 games = {}
@@ -20,6 +20,10 @@ def getRoom():
     gameId = generateId(8)
     if data['mode'] == 2:
         games[gameId] = [time.time(),Connect4(gameMode=2)]
+    elif data['mode'] == 3:
+        game = Connect4()
+        games[gameId] = [time.time(),game]
+        connectBotToGame(gameId,7)
     else:
         games[gameId] = [time.time(),Connect4()]
 
