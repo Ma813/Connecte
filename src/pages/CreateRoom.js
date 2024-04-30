@@ -122,7 +122,11 @@ const register = async () => {
                                 max="10"
                                 value={botDifficulty}
                                 onChange={(e) => setBotDifficulty(parseInt(e.target.value, 10))}
+                                style={{ width: "300px" }} // Optional style to improve visibility
                             />
+                            <div className="sliderValue">
+                                {botDifficulty} / 10
+                            </div>
                         </div>
                     )}
                 </div>
