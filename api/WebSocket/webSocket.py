@@ -24,8 +24,10 @@ def getRoom():
         game = Connect4()
         games[gameId] = [time.time(),game]
         connectBotToGame(gameId,7)
+    elif data['winCondition'] >=1:
+        games[gameId] = [time.time(),Connect4(k=data['winCondition'])]
     else:
-        games[gameId] = [time.time(),Connect4()]
+        games[gameId] = [time.time(),Connect4(k=4)]
 
     return {'gameId':gameId}
 
