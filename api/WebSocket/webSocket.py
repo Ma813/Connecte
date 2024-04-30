@@ -19,8 +19,7 @@ room = Blueprint(name="room", import_name=__name__)
 @room.route("/getRoom", methods=["POST"], strict_slashes=False)
 def getRoom():
     # for future, data['w'] is width and data['h'] is heigth
-  """This method is responsible for creating a new game room"""
-
+    """This method is responsible for creating a new game room"""
     data = request.get_json()
     gameId = generateId(8)
     if data['mode'] == 2:
