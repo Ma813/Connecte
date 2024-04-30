@@ -148,23 +148,27 @@ def registerGame(gameBoard, players, winner):
 
     if winner == None:
         draw = True
-        winner = [-1, -1, -1, -1]
+        winner = {
+            "color": -1,
+            "requestID": -1,
+            "cookie": -1,
+            "token": -1,
+             }
 
     for player in players:
-        if (winner[2] == player[2] and winner[0] == player[0]):
+        if (winner["cookie"] == player["cookie"] and winner["color"] == player["color"]):
             wdl = 'W'
         elif (draw):
             wdl = 'D'
         else:
             wdl = 'L'
 
-        if player[3] != -1:
-            pl = sql_functions.select("username, hashed_pass, email, token", "PLAYERS", f"token = '{player[3]}'").first().username
+        if player["token"] != -1:
+            pl = sql_functions.select("username, hashed_pass, email, token", "PLAYERS", f"token = '{player['token']}'").first().username
         else:
             pl = "Guest"
 
-        sql_functions.insert("PLAYERS_GAMES", {"FKplayer": pl, "FKgame": game.id, "WDL": wdl, "which_turn": player[0]})
-
+        sql_functions.insert("PLAYERS_GAMES", {"FKplayer": pl, "FKgame": game.id, "WDL": wdl, "which_turn": player["color"]})
     return {'message': f'Added game to database', 'gameId': game.id}
 
 

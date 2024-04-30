@@ -8,9 +8,11 @@ const GameRoom = () => {
     const [roomId, setRoomId] = useState('');
     const navigate = useNavigate();
     const [inputValue, setInputValue] = useState('');
+    const [width, setWidth] = useState(7);
+    const [heigth, setHeigth] = useState(6);
     const [gameMode, setGameMode] = useState(1);
     const [winCondition, setWinCondition] = useState(4);
-
+    const [errorMessage, setErrorMessage] = useState('');
 
 
 
@@ -27,6 +29,25 @@ const GameRoom = () => {
 
     const handleSubmit = () => {
         createRoom();
+    };
+
+    const handleHeightChange = (e) => {
+        const newHeight = parseInt(e.target.value, 10);
+        if (newHeight >= 3 && newHeight <= 15) {
+            setHeigth(newHeight);
+            setErrorMessage(''); // Clear any previous error message
+        } else {
+            setErrorMessage('Height must be between 3 and 15.'); // Display error message
+        }
+    };
+    const handleWidthChange = (e) => {
+        const newWidth = parseInt(e.target.value, 10);
+        if (newWidth >= 3 && newWidth <= 15) {
+            setWidth(newWidth);
+            setErrorMessage(''); // Clear any previous error message
+        } else {
+            setErrorMessage('Width must be between 3 and 15.'); // Display error message
+        }
     };
 
     /* CHATBOTAS SAKE KAZKA TOKIO REIKE IDETI
@@ -57,7 +78,9 @@ const register = async () => {
     */
     const createRoom = async () => {
         const userData = {
-            mode: gameMode
+            mode: gameMode,
+            w: width,
+            h: heigth
         };
 
 
@@ -106,6 +129,30 @@ const register = async () => {
                     <input onChange={() => setGameMode(2)} type="radio" id="memoryGameCheck" name="gameMode" value="memoryGame" checked={gameMode === 2}></input>
                     
                     <label htmlFor="memoryGameCheck"> Memory Game</label>
+                </div>
+                <div className='select'>
+                    <label htmlFor="heigthInput">Heigth of the board:</label>
+                    <input
+                        id="heigthInput"
+                        type="number"
+                        value={heigth}
+                        onChange={handleHeightChange}
+                        min="3"
+                        max="15"
+                    />
+                    {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+                </div>
+                <div className='select'>
+                    <label htmlFor="widthInput">Length of the board:</label>
+                    <input
+                        id="widthInput"
+                        type="number"
+                        value={width}
+                        onChange={handleWidthChange}
+                        min="3"
+                        max="15"
+                    />
+                    {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
                 </div>
                 <div className='select'>
                     <label htmlFor="winConditionInput">Number of circles to connect to win:</label>
