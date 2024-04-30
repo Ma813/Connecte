@@ -18,6 +18,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "start-api-mac": ". venv/bin/activate && flask --app api/app.py run --host=0.0.0",
+    "update-mac": "npm i && . venv/bin/activate && pip install -r requirements.txt",
+    "save-mac": ". venv/bin/activate && pip freeze > requirements.txt",
     "start": "react-scripts start ",
     "start-api": "venv/Scripts/activate && flask --app api/app.py run --host=0.0.0.0",
     "update": "npm i && venv/Scripts/activate && pip install -r requirements.txt",
