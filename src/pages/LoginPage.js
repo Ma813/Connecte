@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import '../styles/LoginPage.css';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -25,6 +26,10 @@ const LoginPage = () => {
     }
   };
 
+  const handleForgotPass = () => {
+    navigate('/forgot-password');
+  }
+
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
@@ -45,6 +50,7 @@ const LoginPage = () => {
                 <button type="submit" className="btn btn-primary bg-dark">Login</button>
               </form>
             </div>
+            <p className='blueLink' onClick={handleForgotPass}>Forgot password?</p>
           </div>
         </div>
       </div>
