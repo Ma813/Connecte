@@ -20,6 +20,8 @@
   "scripts": {
     "start": "react-scripts start ",
     "start-api": "venv/Scripts/activate && flask --app api/app.py run --host=0.0.0.0",
+    "update": "npm i && venv/Scripts/activate && pip install -r requirements.txt",
+    "save": "venv/Scripts/activate && pip freeze > requirements.txt",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
