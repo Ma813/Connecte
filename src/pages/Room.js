@@ -110,7 +110,7 @@ const Room = () => {
 
   const renderWaitingForOnePlayer = () => (
     <div>
-      <p className='message'>Waiting for one more player to join...</p>
+      <p className='message'>Waiting for more players to join...</p>
       <p className='message'>Room ID is: <b>{gameId}</b></p>
       <p className='message'>Invite players with this URL: <b>{fullURL}</b> </p>
       <button className='copyButton' onClick={copyURL}>Copy URL</button>

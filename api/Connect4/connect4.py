@@ -135,6 +135,10 @@ class Connect4:
         if toMoveIndex == len(self.players):
             toMoveIndex = 0
         self.toMove = self.players[toMoveIndex]
+        
+    def changePlayerCount(self, playerCount):
+    	if self.state == 0:
+    		self.playerCount = playerCount
 
     def changeState(self):
         '''Change the game state to playing or reset the game if the game is over'''
