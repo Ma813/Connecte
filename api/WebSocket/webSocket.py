@@ -19,10 +19,11 @@ def getRoom():
     """This method is responsible for creating a new game room"""
     data = request.get_json()
     gameId = generateId(8)
+    
     if data["mode"] == 2:
-        games[gameId] = [time.time(), Connect4(gameMode=2)]
+        games[gameId] = [time.time(), Connect4(gameMode=2, playerCount=2)]
     else:
-        games[gameId] = [time.time(), Connect4()]
+        games[gameId] = [time.time(), Connect4(playerCount=data["playerCount"])]
 
     return {"gameId": gameId}
 

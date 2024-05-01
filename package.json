@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "react-scripts start ",
-    "start-api": "venv/Scripts/activate && flask --app api/app.py run --host=0.0.0.0",
+    "start-api": "venv/bin/activate && flask --app api/app.py run --host=0.0.0.0",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

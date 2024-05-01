@@ -10,6 +10,8 @@ const GameRoom = () => {
     const [inputValue, setInputValue] = useState('');
     const [gameMode, setGameMode] = useState(1);
     const [winCondition, setWinCondition] = useState(4);
+    const [playerCondition, setPlayerCondition] = useState(2);
+    
 
 
 
@@ -57,7 +59,8 @@ const register = async () => {
     */
     const createRoom = async () => {
         const userData = {
-            mode: gameMode
+            mode: gameMode,
+            playerCount: playerCondition
         };
 
 
@@ -101,6 +104,17 @@ const register = async () => {
                     <input onChange={() => setGameMode(1)} type="radio" id="standardGameCheck" name="gameMode" value="standardGame" checked={gameMode === 1}></input>
                     
                     <label   htmlFor="standardGameCheck"> Standard game</label>
+                </div>
+                <div className='select'>
+                    <label htmlFor="winConditionInput">Number of players:</label>
+                    <input
+                        id="playerInput"
+                        type="number"
+                        value={playerCondition}
+                        onChange={e => setPlayerCondition(parseInt(e.target.value, 10))}
+                        min="2"  // Minimum of 3 to make it reasonable
+                        max="4"
+                    />
                 </div>
                 <div className='select'>
                     <input onChange={() => setGameMode(2)} type="radio" id="memoryGameCheck" name="gameMode" value="memoryGame" checked={gameMode === 2}></input>
