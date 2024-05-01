@@ -9,18 +9,22 @@ class Connect4:
         self.h = h
         self.w = w
         self.k = k
-        self.toMove = [
-            -1,
-            -1,
-            -1,
-            -1,
-            "name",
-        ]  # color, requestID, cookie, token, username
+
+        self.toMove = {
+            "color": -1,
+            "requestID": -1,
+            "cookie": -1,
+            "token": -1,
+            "username": "name"
+        }
+
+
         self.players = []
         self.playerCount = playerCount
         self.state = 0
         self.board = np.zeros((h, w))
         self.gameMode = gameMode
+        
 
     def getState(self):
         '''Get the state of the game'''
@@ -33,9 +37,9 @@ class Connect4:
     def getBoardString(self):
         '''Get the game's board as a string'''
         if self.gameMode == 1:
-            return np.array2string(self.board)
+            return np.array2string(self.board,separator=',')
         else:
-            return np.array2string(self.singleColor())
+            return np.array2string(self.singleColor(),separator=',')
 
     def singleColor(self):
         '''Get the game's board as a string with only one color for every token on the board'''
@@ -67,13 +71,14 @@ class Connect4:
             raise Exception("Not a legal move")
         for i in range(self.h):
             if self.board[self.h - 1 - i][row] == 0:
-                self.board[self.h - 1 - i][row] = self.toMove[0]
+                self.board[self.h - 1 - i][row] = self.toMove["color"]
                 return True
 
     def checkForWin(self):
         '''Returns true if a player has won the game
         by connecting k tokens in a row, otherwise returns false'''
-        color = self.toMove[0]
+        color = self.toMove["color"]
+
         for c in range(self.w - self.k + 1):
             for r in range(self.h):
                 for i in range(self.k):
@@ -111,7 +116,14 @@ class Connect4:
         '''Add a player to the game,
         if the player count is reached, change the game state to 1 (playing)'''
         playerNumber = len(self.players)
-        self.players.append([playerNumber + 1, requestid, id, token, name])
+
+        self.players.append({
+            "color": playerNumber + 1,
+            "requestID": requestid,
+            "cookie": id,
+            "token": token,
+            "username": name
+            })
 
         if len(self.players) == self.playerCount:
             self.changeState()

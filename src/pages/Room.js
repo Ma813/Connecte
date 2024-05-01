@@ -47,6 +47,7 @@ const Room = () => {
 
     
     const newSocket = io(window.location.hostname + ':5000');
+    console.log(window.location.hostname + ':5000')
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
