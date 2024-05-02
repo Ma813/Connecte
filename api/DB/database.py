@@ -1,4 +1,5 @@
-'''This file contains the methods to interact with the database.'''
+"""This file contains the methods to interact with the database."""
+
 import hmac
 import hashlib
 import random
@@ -16,17 +17,18 @@ pepper = json.load(open("config.json"))
 
 
 class SqlFunctions:
-    '''This class contains methods to interact with the database with SQL queries.'''
+    """This class contains methods to interact with the database with SQL queries."""
+
     def __init__(self, database):
         self.database = database
 
     def select(self, fields, table, condition):
-        '''This method selects data from the database.'''
+        """This method selects data from the database."""
         query = text(f"SELECT {fields} FROM connecte.{table} WHERE {condition}")
         return self.database.session.execute(query)
 
     def insert(self, table, values):
-        '''This method inserts data into the database.'''
+        """This method inserts data into the database."""
         columns = ", ".join(values.keys())
         vals = ", ".join([f"'{v}'" for v in values.values()])
         query = text(f"INSERT INTO connecte.{table} ({columns}) VALUES({vals})")
@@ -34,7 +36,7 @@ class SqlFunctions:
         self.database.session.commit()
 
     def update(self, table, setValues, condition):
-        '''This method updates data in the database.'''
+        """This method updates data in the database."""
         setClause = ", ".join(
             [f"{key} = '{value}'" for key, value in setValues.items()]
         )
@@ -47,7 +49,8 @@ sql_functions = SqlFunctions(da)
 
 
 class Players(da.Model):
-    '''This class represents the PLAYERS table in the database.'''
+    """This class represents the PLAYERS table in the database."""
+
     __tablename__ = "connecte.PLAYERS"
     username = da.Column(da.String(50), primary_key=True)
     token = da.Column(da.String(255))
@@ -57,7 +60,8 @@ class Players(da.Model):
 
 
 class Games(da.Model):
-    '''This class represents the GAMES table in the database.'''
+    """This class represents the GAMES table in the database."""
+
     __tablename__ = "connecte.GAMES"
     id = da.Column(da.Integer, primary_key=True, autoincrement=True)
     game_board = da.Column(da.String(1024))
@@ -65,7 +69,8 @@ class Games(da.Model):
 
 
 class PlayersGames(da.Model):
-    '''This class represents the PLAYERS_GAMES table in the database.'''
+    """This class represents the PLAYERS_GAMES table in the database."""
+
     __tablename__ = "connecte.PLAYERS_GAMES"
     id = da.Column(da.Integer, primary_key=True, autoincrement=True)
     FKplayer = da.Column(da.String(50), da.ForeignKey("players.username"))
@@ -75,16 +80,16 @@ class PlayersGames(da.Model):
 
 
 def generateId(lenght, prefix=""):
-    '''This method generates a random ID with with a specific length.'''
+    """This method generates a random ID with with a specific length."""
     return prefix.join(random.choices(string.ascii_lowercase + string.digits, k=lenght))
 
 
 @datab.route("/verify", methods=["POST"])
 def verify():
-    '''This method verifies the users email by checking the verification ID in the request.
-    If verification ID is valid, the user is verified and the verification ID is removed 
+    """This method verifies the users email by checking the verification ID in the request.
+    If verification ID is valid, the user is verified and the verification ID is removed
     from the database.
-    If not, an error message is sent to the client.'''
+    If not, an error message is sent to the client."""
     try:
         data = request.get_json()
         id = data["id"]
@@ -103,7 +108,7 @@ def verify():
 
 @datab.route("/registerPlayer", methods=["POST"])
 def createPlayer():
-    '''This method creates a new player in the database.'''
+    """This method creates a new player in the database."""
     try:
         data = request.get_json()
         usern = data["username"]
@@ -158,7 +163,7 @@ def createPlayer():
 
 
 def checkToken(token):
-    '''This method checks if the token is valid and returns the user's data.'''
+    """This method checks if the token is valid and returns the user's data."""
     if token is not None:
         return sql_functions.select(
             "username, hashed_pass, email, token", "PLAYERS", f"token = '{token}'"
@@ -167,7 +172,7 @@ def checkToken(token):
 
 
 def getName(token):
-    '''This method returns the username of the user with the specified token.'''
+    """This method returns the username of the user with the specified token."""
     if token is not None:
         return sql_functions.select(
             "username, hashed_pass, email, token", "PLAYERS", f"token = '{token}'"
@@ -176,7 +181,7 @@ def getName(token):
 
 
 def registerGame(gameBoard, players, winner):
-    '''This method registers a game and its data into the database.'''
+    """This method registers a game and its data into the database."""
     now = datetime.datetime.now()
     time = now.strftime("%Y-%m-%d %H:%M:%S")
     sql_functions.insert("GAMES", {"game_board": gameBoard, "time_date": time})
@@ -193,38 +198,52 @@ def registerGame(gameBoard, players, winner):
             "requestID": -1,
             "cookie": -1,
             "token": -1,
-             }
+        }
 
     for player in players:
-        if (winner["cookie"] == player["cookie"] and winner["color"] == player["color"]):
-            wdl = 'W'
-        elif (draw):
-            wdl = 'D'
+        if winner["cookie"] == player["cookie"] and winner["color"] == player["color"]:
+            wdl = "W"
+        elif draw:
+            wdl = "D"
         else:
             wdl = "L"
 
-
         if player["token"] != -1:
-            pl = sql_functions.select("username, hashed_pass, email, token", "PLAYERS", f"token = '{player['token']}'").first().username
+            pl = (
+                sql_functions.select(
+                    "username, hashed_pass, email, token",
+                    "PLAYERS",
+                    f"token = '{player['token']}'",
+                )
+                .first()
+                .username
+            )
         else:
             pl = "Guest"
 
-        sql_functions.insert("PLAYERS_GAMES", {"FKplayer": pl, "FKgame": game.id, "WDL": wdl, "which_turn": player["color"]})
-    return {'message': f'Added game to database', 'gameId': game.id}
-
+        sql_functions.insert(
+            "PLAYERS_GAMES",
+            {
+                "FKplayer": pl,
+                "FKgame": game.id,
+                "WDL": wdl,
+                "which_turn": player["color"],
+            },
+        )
+    return {"message": f"Added game to database", "gameId": game.id}
 
 
 def userExists(usern):
-    '''This method checks if the user exists in the database.
-    Returns user data if user exists, otherwise returns None.'''
+    """This method checks if the user exists in the database.
+    Returns user data if user exists, otherwise returns None."""
     user = Players.query.filter_by(username=usern).first()
     return user
 
 
 @datab.route("/stats", methods=["POST"])
 def getuserData():
-    '''This method returns the user's data and game history by checking 
-    the token in the request and returning the user's data.'''
+    """This method returns the user's data and game history by checking
+    the token in the request and returning the user's data."""
     data = request.get_json()
     if data["token"] is None or checkToken(data["token"]) is None:
         return {"error": "Authentication failure"}
@@ -307,8 +326,8 @@ def getuserData():
 
 @datab.route("/checkUser", methods=["POST"])
 def checkUser():
-    '''This method checks if the user exists in the database by checking
-    the username and password in the request.'''
+    """This method checks if the user exists in the database by checking
+    the username and password in the request."""
     try:
         data = request.get_json()
         usern = data["username"]

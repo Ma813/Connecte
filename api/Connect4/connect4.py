@@ -1,10 +1,12 @@
-'''This file is responsible for the game logic'''
+"""This file is responsible for the game logic"""
+
 import random
 import numpy as np
 
 
 class Connect4:
-    '''This class is responsible for storing information about a game'''
+    """This class is responsible for storing information about a game"""
+
     def __init__(self, h=6, w=7, k=4, playerCount=2, gameMode=1):
         self.h = h
         self.w = w
@@ -15,34 +17,32 @@ class Connect4:
             "requestID": -1,
             "cookie": -1,
             "token": -1,
-            "username": "name"
+            "username": "name",
         }
-
 
         self.players = []
         self.playerCount = playerCount
         self.state = 0
         self.board = np.zeros((h, w))
         self.gameMode = gameMode
-        
 
     def getState(self):
-        '''Get the state of the game'''
+        """Get the state of the game"""
         return self.state
 
     def changeMode(self):
-        '''Change the game mode to normal mode'''
+        """Change the game mode to normal mode"""
         self.gameMode = 1
 
     def getBoardString(self):
-        '''Get the game's board as a string'''
+        """Get the game's board as a string"""
         if self.gameMode == 1:
-            return np.array2string(self.board,separator=',')
+            return np.array2string(self.board, separator=",")
         else:
-            return np.array2string(self.singleColor(),separator=',')
+            return np.array2string(self.singleColor(), separator=",")
 
     def singleColor(self):
-        '''Get the game's board as a string with only one color for every token on the board'''
+        """Get the game's board as a string with only one color for every token on the board"""
         newBoard = np.zeros((self.h, self.w))
         for x in range(0, self.h):
             for y in range(0, self.w):
@@ -52,7 +52,7 @@ class Connect4:
         return newBoard
 
     def legalMoves(self):
-        '''Returns a list of legal moves that can be made in the game'''
+        """Returns a list of legal moves that can be made in the game"""
         moves = []
         for i in range(self.w):
             if self.board[0][i] == 0:
@@ -60,13 +60,13 @@ class Connect4:
         return moves
 
     def checkForDraw(self):
-        '''Returns true if the game reached a draw condition, otherwise returns false'''
+        """Returns true if the game reached a draw condition, otherwise returns false"""
         if self.checkForWin() is False and len(self.legalMoves()) == 0:
             return True
         return False
 
     def placeTile(self, row):
-        '''Returns true if placing a tile was successful, otherwise raises an exception'''
+        """Returns true if placing a tile was successful, otherwise raises an exception"""
         if int(row) not in self.legalMoves():
             raise Exception("Not a legal move")
         for i in range(self.h):
@@ -75,8 +75,8 @@ class Connect4:
                 return True
 
     def checkForWin(self):
-        '''Returns true if a player has won the game
-        by connecting k tokens in a row, otherwise returns false'''
+        """Returns true if a player has won the game
+        by connecting k tokens in a row, otherwise returns false"""
         color = self.toMove["color"]
 
         for c in range(self.w - self.k + 1):
@@ -113,35 +113,37 @@ class Connect4:
         return False
 
     def addPlayer(self, requestid, id, token, name):
-        '''Add a player to the game,
-        if the player count is reached, change the game state to 1 (playing)'''
+        """Add a player to the game,
+        if the player count is reached, change the game state to 1 (playing)"""
         playerNumber = len(self.players)
 
-        self.players.append({
-            "color": playerNumber + 1,
-            "requestID": requestid,
-            "cookie": id,
-            "token": token,
-            "username": name
-            })
+        self.players.append(
+            {
+                "color": playerNumber + 1,
+                "requestID": requestid,
+                "cookie": id,
+                "token": token,
+                "username": name,
+            }
+        )
 
         if len(self.players) == self.playerCount:
             self.changeState()
             return
 
     def changeToMove(self):
-        '''Change the player that is to move next'''
+        """Change the player that is to move next"""
         toMoveIndex = self.players.index(self.toMove) + 1
         if toMoveIndex == len(self.players):
             toMoveIndex = 0
         self.toMove = self.players[toMoveIndex]
-        
+
     def changePlayerCount(self, playerCount):
-    	if self.state == 0:
-    		self.playerCount = playerCount
+        if self.state == 0:
+            self.playerCount = playerCount
 
     def changeState(self):
-        '''Change the game state to playing or reset the game if the game is over'''
+        """Change the game state to playing or reset the game if the game is over"""
         if self.state == 0:
             self.state = 1
             self.toMove = random.choice(self.players)
