@@ -28,6 +28,8 @@ const ProfilePage = () => {
   const [chartData, setChartData] = useState(null);
   const { isAuthenticated } = useAuth(); // Assuming 'user' contains the logged-in user's details
   const navigate = useNavigate();
+  const [showingBoard, setShowingBoard] = useState(false);
+  const [board, setBoard] = useState(null);
 
 
 
@@ -78,14 +80,12 @@ const ProfilePage = () => {
 
     try {
       // Step 1: Remove all periods and trim unnecessary whitespace
-      console.log(boardString)
       let cleanedString = boardString.replace(/[\.,]|\./g, ' ').trim();
 
       let trimedString = cleanedString.substring(1, cleanedString.length - 1);
 
       // Step 2: Split the string into rows by the newline character
       let rows = trimedString.split('\n').map(row => row.trim());
-      console.log(rows)
       // Step 3: Remove the outer brackets and split each row into numbers
       rows = rows.map(row =>
         row.slice(1, row.length - 1) // Remove the '[' and ']' from each row
@@ -100,6 +100,11 @@ const ProfilePage = () => {
       return [];
     }
   }
+
+  const handleShowBoard = (board) => {
+    setShowingBoard(true);
+    setBoard(convertBoardStringToArray(board));
+  };
 
   //TODO: Make this into a nice table
   const renderGamesTable = (games) => {
@@ -120,14 +125,16 @@ const ProfilePage = () => {
             <tr>
               <td>{game.WDL}</td>
               <td>{game.time}</td>
-              <td>{colors[game.which_turn - 1]}</td>
+              <td>
+                <div className="profile-circle" style={{ backgroundColor: colors[game.which_turn - 1] }}></div>
+              </td>
               <td>{game.opponents}</td>
               <td>
                 {/* Convert string board to array and render */}
-                {game.board ? <MiniGameBoard board={convertBoardStringToArray(game.board)} /> : <p>No board data</p>}
+                <p className='blueLink' onClick={() => handleShowBoard(game.board)}>Show</p>
+                {/* {game.board ? <MiniGameBoard board={convertBoardStringToArray(game.board)} /> : <p>No board data</p>} */}
               </td>
               {/*console.log(game.board)*/}
-              {console.log(convertBoardStringToArray(game.board))}
             </tr>
           ))}
 
@@ -148,21 +155,18 @@ const ProfilePage = () => {
 
 
   return (
-    <div className="container mt-5 text-light p-4 rounded">
-      <h2 className="text-center mb-4 fullW">Profile page</h2>
-      <div className="row justify-content-center fullW">
-        <div className="col-12 col-md-8 text-md-left text-center full-width">
+    <div className="container mt-5 text-light p-4 rounded fullW">
+      <h2 className="text-center mb-4">Profile page</h2>
+      <div className="row justify-content-center">
+        <div className="col-12 col-md-8 text-center">
           {/* Name and Email Information */}
 
-          <table className="table table-dark table-striped full-width">
+          <table className="table table-dark table-striped center">
             <thead>
               <tr>
                 <th scope="col">Username</th>
                 <th scope="col">Email</th>
                 <th scope="col">Password</th>
-                <th scope="col">Wins</th>
-                <th scope="col">Draws</th>
-                <th scope="col">Losses</th>
               </tr>
             </thead>
             <tbody>
@@ -170,19 +174,22 @@ const ProfilePage = () => {
                 <td>{username}</td>
                 <td>{email}</td>
                 <td className='blueLink' onClick={handleChangePass}>Change</td>
-                <td>{winCount}</td>
-                <td>{drawCount}</td>
-                <td>{loseCount}</td>
               </tr>
             </tbody>
           </table>
           {chartData && <PieChart chartData={chartData} />}
           {renderGamesTable(games)}
-          <div className='Chart'>
-
-          </div>
         </div>
       </div>
+      {showingBoard && board &&
+        <div className="game-end-overlay">
+          <div className="game-end-content">
+            {<MiniGameBoard board={board} />}
+            {<button onClick={() => setShowingBoard(false)}>Close</button>}
+          </div>
+        </div>
+      }
+
     </div>
   );
 };
