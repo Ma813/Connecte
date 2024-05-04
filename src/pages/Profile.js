@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Cookies from 'universal-cookie';
 import path from '../Path'
 import MiniGameBoard from './MiniGameBoard';
 import PieChart from '../components/PieChart';
+import "../styles/ProfilePage.css";
 
 const cookies = new Cookies(null, { path: '/' });
 
@@ -25,6 +27,7 @@ const ProfilePage = () => {
   const colors = ['red', 'yellow', 'TBD', 'TBD'];
   const [chartData, setChartData] = useState(null);
   const { isAuthenticated } = useAuth(); // Assuming 'user' contains the logged-in user's details
+  const navigate = useNavigate();
 
 
 
@@ -69,35 +72,35 @@ const ProfilePage = () => {
 
   function convertBoardStringToArray(boardString) {
     if (!boardString) {
-        console.error('Invalid or empty board string:', boardString);
-        return []; // Return an empty array as a fallback
+      console.error('Invalid or empty board string:', boardString);
+      return []; // Return an empty array as a fallback
     }
 
     try {
       // Step 1: Remove all periods and trim unnecessary whitespace
       console.log(boardString)
       let cleanedString = boardString.replace(/[\.,]|\./g, ' ').trim();
-      
-      let trimedString = cleanedString.substring(1, cleanedString.length-1);
-      
+
+      let trimedString = cleanedString.substring(1, cleanedString.length - 1);
+
       // Step 2: Split the string into rows by the newline character
       let rows = trimedString.split('\n').map(row => row.trim());
       console.log(rows)
       // Step 3: Remove the outer brackets and split each row into numbers
-      rows = rows.map(row => 
-          row.slice(1, row.length - 1) // Remove the '[' and ']' from each row
+      rows = rows.map(row =>
+        row.slice(1, row.length - 1) // Remove the '[' and ']' from each row
           .trim()
           .split(/\s+/) // Split the row by one or more spaces
           .map(Number) // Convert each element from string tmo number
       );
 
       return rows;
-  } catch (error) {
+    } catch (error) {
       console.error('Error converting board string to array:', boardString, error);
       return [];
+    }
   }
-}
-  
+
   //TODO: Make this into a nice table
   const renderGamesTable = (games) => {
     //console.log(games)
@@ -120,48 +123,68 @@ const ProfilePage = () => {
               <td>{colors[game.which_turn - 1]}</td>
               <td>{game.opponents}</td>
               <td>
-              {/* Convert string board to array and render */}
-              {game.board ? <MiniGameBoard board={convertBoardStringToArray(game.board)} /> : <p>No board data</p>}
-            </td>
-            {/*console.log(game.board)*/}
+                {/* Convert string board to array and render */}
+                {game.board ? <MiniGameBoard board={convertBoardStringToArray(game.board)} /> : <p>No board data</p>}
+              </td>
+              {/*console.log(game.board)*/}
               {console.log(convertBoardStringToArray(game.board))}
             </tr>
           ))}
-          
+
         </tbody>
       </table>
     );
   }
 
-          if (!loaded) {
-            console.log("loading...")
-          handleSubmit()
-          setLoaded(true)
+  if (!loaded) {
+    console.log("loading...")
+    handleSubmit()
+    setLoaded(true)
   }
-          return (
-            
 
-          <div className="container mt-5 text-light p-4 rounded">
-            <canvas id="chartID"></canvas>
-            <h2 className="text-center mb-4">Profile Information</h2>
-            <div className="row justify-content-center">
-              <div className="col-12 col-md-8 text-md-left text-center">
-                {/* Name and Email Information */}
-                <p><strong>Name:</strong> {username}</p>
-                <p><strong>Email:</strong> {email}</p>
-                <p><strong>Win count:</strong> {winCount}</p>
-                <p><strong>Draw count:</strong> {drawCount}</p>
-                <p><strong>Lose count:</strong> {loseCount}</p>
-                <p className='text-center'><strong>WDL chart:</strong></p> 
-                {chartData && <PieChart chartData={chartData} />}
-                {renderGamesTable(games)}
-                <div className='Chart'>
-                
-                </div>
-              </div>
-            </div>
+  const handleChangePass = () => {
+    navigate('/forgot-password');
+  }
+
+
+  return (
+    <div className="container mt-5 text-light p-4 rounded">
+      <h2 className="text-center mb-4 fullW">Profile page</h2>
+      <div className="row justify-content-center fullW">
+        <div className="col-12 col-md-8 text-md-left text-center full-width">
+          {/* Name and Email Information */}
+
+          <table className="table table-dark table-striped full-width">
+            <thead>
+              <tr>
+                <th scope="col">Username</th>
+                <th scope="col">Email</th>
+                <th scope="col">Password</th>
+                <th scope="col">Wins</th>
+                <th scope="col">Draws</th>
+                <th scope="col">Losses</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{username}</td>
+                <td>{email}</td>
+                <td className='blueLink' onClick={handleChangePass}>Change</td>
+                <td>{winCount}</td>
+                <td>{drawCount}</td>
+                <td>{loseCount}</td>
+              </tr>
+            </tbody>
+          </table>
+          {chartData && <PieChart chartData={chartData} />}
+          {renderGamesTable(games)}
+          <div className='Chart'>
+
           </div>
-          );
+        </div>
+      </div>
+    </div>
+  );
 };
 
-          export default ProfilePage;
+export default ProfilePage;

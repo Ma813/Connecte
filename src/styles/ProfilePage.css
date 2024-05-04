@@ -1,0 +1,14 @@
+.blueLink{
+    color: #007bff;
+    text-decoration: none;
+    justify-content: center;
+    display: flex;
+    &:hover{
+        text-decoration: underline;
+        cursor: pointer;
+    }
+}
+
+.fullW{
+    width: 100%;
+}
