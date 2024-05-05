@@ -43,15 +43,16 @@ CREATE TABLE `PLAYERS` (
   `email` varchar(255) NOT NULL,
   `token` varchar(255) NOT NULL,
   `verifyID` varchar(50) NOT NULL,
-  `verified` tinyint(1) NOT NULL
+  `verified` tinyint(1) NOT NULL,
+  `lastChange` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `PLAYERS`
 --
 
-INSERT INTO `PLAYERS` (`username`, `hashed_pass`, `email`, `token`, `verifyID`, `verified`) VALUES
-('Guest', '', '', '', '', 0);
+INSERT INTO `PLAYERS` (`username`, `hashed_pass`, `email`, `token`, `verifyID`, `verified`, `lastChange`) VALUES
+('Guest', '', '', '', '', 0, NULL);
 
 --
 -- Table structure for table `PLAYERS_GAMES`

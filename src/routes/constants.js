@@ -6,7 +6,8 @@ const PathConstants = {
     REGISTER:"register",
     PROFILE:"profile",
     VERIFY:"verify/:verifyID",
-    FORGOTPASSWORD:"forgot-password"
+    FORGOTPASSWORD:"forgot-password",
+    CHANGEPASSWORD:"change-password"
 }
 
 export default PathConstants

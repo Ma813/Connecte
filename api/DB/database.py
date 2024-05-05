@@ -57,6 +57,8 @@ class Players(da.Model):
     hashed_pass = da.Column(da.String(255))
     email = da.Column(da.String(255))
     verified = da.Column(da.Integer)
+    lastChange = da.Column(da.DateTime)
+    lastReset = da.Column(da.DateTime)
 
 
 class Games(da.Model):
@@ -365,13 +367,20 @@ def resetPass():
         username = data["username"]
 
         user = sql_functions.select(
-            "email, verified, username", "PLAYERS", f"username = '{username}'"
+            "email, verified, username, lastReset",
+            "PLAYERS",
+            f"username = '{username}'",
         ).first()
 
         if user is None:
             return {"error": "Username doesn't exist"}
         if user.verified == 0:
             return {"error": "User needs to be verified to reset password"}
+        if (
+            user.lastReset is not None
+            and (datetime.datetime.now() - user.lastReset).days < 7
+        ):
+            return {"error": "Password can only be reset once every seven days"}
 
         newPassword = generateId(10)
 
@@ -387,9 +396,79 @@ def resetPass():
         sql_functions.update(
             "PLAYERS", {"hashed_pass": passw}, f"username = '{user.username}'"
         )
+        sql_functions.update(
+            "PLAYERS",
+            {"lastReset": datetime.datetime.now()},
+            f"username = '{user.username}'",
+        )
         sendNewPassword(user.email, newPassword, user.username)
 
         return {"message": "Password reset email sent"}
+
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@datab.route("/changePassword", methods=["POST"])
+def changePass():
+    """This method changes the password of the user specified in the request."""
+    try:
+        data = request.get_json()
+        token = data["token"]
+        oldPass = data["oldPassword"]
+        newPass = data["newPassword"]
+
+        if checkToken(token) is None:
+            return {"error": "Authentication failure, please log in again"}
+
+        if oldPass == newPass:
+            return {"error": "Old and new password cannot be the same"}
+
+        if len(newPass) < 8:
+            return {"error": "Password must be at least 8 characters long"}
+
+        username = checkToken(token).username
+        user = sql_functions.select(
+            "username, hashed_pass, email, token, lastChange",
+            "PLAYERS",
+            f"username = '{username}'",
+        ).first()
+
+        if not bcrypt.checkpw(
+            hmac.new(
+                pepper["Pepper"].encode("utf-8"),
+                oldPass.encode("utf-8"),
+                hashlib.sha256,
+            )
+            .hexdigest()
+            .encode("utf-8"),
+            str.encode(user.hashed_pass, "utf-8"),
+        ):
+            return {"error": "Incorrect password"}
+
+        if user.lastChange is not None:
+            delta = datetime.datetime.now() - user.lastChange
+            deltaHours = delta.days * 24 + delta.seconds / 3600
+            if deltaHours < 12:
+                return {"error": "Password can only be changed once every 12 hours"}
+
+        passw = hmac.new(
+            pepper["Pepper"].encode("utf-8"), newPass.encode("utf-8"), hashlib.sha256
+        ).hexdigest()
+        salt = bcrypt.gensalt()
+        passw = bcrypt.hashpw(passw.encode("utf-8"), salt)
+        passw = passw.decode("utf-8")
+
+        sql_functions.update(
+            "PLAYERS", {"hashed_pass": passw}, f"username = '{username}'"
+        )
+
+        sql_functions.update(
+            "PLAYERS",
+            {"lastChange": datetime.datetime.now()},
+            f"username = '{username}'",
+        )
+        return {"success": "Password changed successfully"}
 
     except Exception as e:
         return {"error": str(e)}

@@ -41,7 +41,7 @@ def sendNewPassword(email, password, username):
     
     {password}
     
-    We recommend changing it, however, the feature to change your password is expected to come in a later update to the game. Expected date for update is May 16th.
+    We recommend changing it in the profile page.
     """
     msg.body = body
 

@@ -7,6 +7,7 @@ import path from '../Path'
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -27,14 +28,15 @@ const ForgotPassword = () => {
         });
 
         const responseData = await response.json();
-        console.log(responseData)
-        setError(responseData.error)
 
-        if (responseData.message === 'Password reset email sent')
-        {
-            navigate('/login')
+        if (responseData.error) {
+            setSuccess('')
+            return setError(responseData.error);
         }
-
+        if (responseData.message) {
+            setError('')
+            return setSuccess(responseData.message);
+        }
     };
 
     return (
@@ -45,6 +47,7 @@ const ForgotPassword = () => {
                         <h5 className="card-header bg-dark">Reset Password</h5>
                         <div className="card-body">
                             {error && <div className="alert alert-danger" role="">{error}</div>}
+                            {success && <div className="alert alert-success" role="">{success}</div>}
                             <form onSubmit={handleSubmit}>
                                 <div className="form-group">
                                     <label className="text-secondary" htmlFor="name">Username</label>

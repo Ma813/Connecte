@@ -22,7 +22,7 @@ const ProfilePage = () => {
   const [drawCount, setDrawCount] = useState('');
   const [loseCount, setLoseCount] = useState('');
   const [loaded, setLoaded] = useState(false);
-  const [games, setGames] = useState([{}]);
+  const [games, setGames] = useState([]);
   const [gameTable, setGameTable] = useState({});
   const colors = ['red', 'yellow', 'TBD', 'TBD'];
   const [chartData, setChartData] = useState(null);
@@ -54,6 +54,7 @@ const ProfilePage = () => {
 
     const responseData = await response.json();
     const data = responseData.message
+    if (data === undefined) return;
     setEmail(data.email)
     setUsername(data.username)
     setWinCount(data.winCount)
@@ -150,7 +151,7 @@ const ProfilePage = () => {
   }
 
   const handleChangePass = () => {
-    navigate('/forgot-password');
+    navigate('/change-password');
   }
 
 
