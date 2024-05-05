@@ -1,12 +1,17 @@
 """This file contains the methods to send emails to users."""
 
+from threading import Thread
 from flask_mail import Message
-from flask import Blueprint
+from flask import Blueprint, current_app
 from extensions import mail
 
 
 emailer = Blueprint(name="email", import_name=__name__)
 
+def sendAsyncEmail(app, msg):
+    """This method sends an email asynchronously"""
+    with app.app_context():
+        mail.send(msg)
 
 def sendVerifyLink(email, verificationID, username):
     """This method sends a verification link to the user with a specific email and username.
@@ -26,7 +31,9 @@ def sendVerifyLink(email, verificationID, username):
     """
     msg.body = body
 
-    mail.send(msg)
+    app = current_app._get_current_object()
+    thr = Thread(target=sendAsyncEmail, args=(app, msg))
+    thr.start()
 
 
 def sendNewPassword(email, password, username):
@@ -44,5 +51,8 @@ def sendNewPassword(email, password, username):
     We recommend changing it in the profile page.
     """
     msg.body = body
+    
+    app = current_app._get_current_object()
+    thr = Thread(target=sendAsyncEmail, args=(app, msg))
+    thr.start()
 
-    mail.send(msg)
