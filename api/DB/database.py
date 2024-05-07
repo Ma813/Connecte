@@ -235,6 +235,49 @@ def registerGame(gameBoard, players, winner):
     return {"message": f"Added game to database", "gameId": game.id}
 
 
+def registerLeave(gameBoard, players, leaver):
+    """This method registers a player leaving the game into the database.
+    It registers the game as a loss for the player who left
+    and as a win for the other player."""
+    now = datetime.datetime.now()
+    time = now.strftime("%Y-%m-%d %H:%M:%S")
+    sql_functions.insert("GAMES", {"game_board": gameBoard, "time_date": time})
+    game = sql_functions.select("*", "GAMES", f"time_date = '{time}'").first()
+
+    da.session.commit()
+
+    for player in players:
+        if leaver["cookie"] == player["cookie"] and leaver["color"] == player["color"]:
+            wdl = "L"
+        else:
+            wdl = "W"
+
+        if player["token"] != -1:
+            pl = (
+                sql_functions.select(
+                    "username, hashed_pass, email, token",
+                    "PLAYERS",
+                    f"token = '{player['token']}'",
+                )
+                .first()
+                .username
+            )
+        else:
+            pl = "Guest"
+
+        sql_functions.insert(
+            "PLAYERS_GAMES",
+            {
+                "FKplayer": pl,
+                "FKgame": game.id,
+                "WDL": wdl,
+                "which_turn": player["color"],
+            },
+        )
+    return {"message": f"Added game to database", "gameId": game.id}
+    
+
+
 def userExists(usern):
     """This method checks if the user exists in the database.
     Returns user data if user exists, otherwise returns None."""
