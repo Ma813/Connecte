@@ -107,7 +107,6 @@ const ProfilePage = () => {
     setBoard(convertBoardStringToArray(board));
   };
 
-  //TODO: Make this into a nice table
   const renderGamesTable = (games) => {
     //console.log(games)
     return (
@@ -119,6 +118,7 @@ const ProfilePage = () => {
             <th scope="col">Color</th>
             <th scope="col">Opponent(s)</th>
             <th scope="col">Board</th>
+            <th scope="col">Notes</th>
           </tr>
         </thead>
         <tbody>
@@ -135,7 +135,8 @@ const ProfilePage = () => {
                 <p className='blueLink' onClick={() => handleShowBoard(game.board)}>Show</p>
                 {/* {game.board ? <MiniGameBoard board={convertBoardStringToArray(game.board)} /> : <p>No board data</p>} */}
               </td>
-              {/*console.log(game.board)*/}
+              <td>{game.notes}</td>
+              {console.log(game)}
             </tr>
           ))}
 

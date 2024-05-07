@@ -79,6 +79,7 @@ class PlayersGames(da.Model):
     FKgame = da.Column(da.Integer, da.ForeignKey("games.id"))
     WDL = da.Column(da.String(1))
     which_turn = da.Column(da.Integer)
+    notes = da.Column(da.String(100))
 
 
 def generateId(lenght, prefix=""):
@@ -182,7 +183,7 @@ def getName(token):
     return "Guest"
 
 
-def registerGame(gameBoard, players, winner):
+def registerGame(gameBoard, players, winner, tiles):
     """This method registers a game and its data into the database."""
     now = datetime.datetime.now()
     time = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -200,26 +201,33 @@ def registerGame(gameBoard, players, winner):
             "requestID": -1,
             "cookie": -1,
             "token": -1,
+            "username": "name",
         }
+    else:
+        sql_functions.insert(
+            "PLAYERS_GAMES",
+            {
+                "FKplayer": winner["username"],
+                "FKgame": game.id,
+                "WDL": "W",
+                "which_turn": winner["color"],
+                "notes": f"Connected {tiles} in a row to win!",
+            },
+        )
 
     for player in players:
+        note = ""
         if winner["cookie"] == player["cookie"] and winner["color"] == player["color"]:
-            wdl = "W"
+            continue
         elif draw:
+            note = f"No one connected {tiles} in a row! It is a draw!"
             wdl = "D"
         else:
+            note = f"{winner['username']} connected {tiles} in a row to win!"
             wdl = "L"
 
         if player["token"] != -1:
-            pl = (
-                sql_functions.select(
-                    "username, hashed_pass, email, token",
-                    "PLAYERS",
-                    f"token = '{player['token']}'",
-                )
-                .first()
-                .username
-            )
+            pl = checkToken(player["token"]).username
         else:
             pl = "Guest"
 
@@ -230,6 +238,7 @@ def registerGame(gameBoard, players, winner):
                 "FKgame": game.id,
                 "WDL": wdl,
                 "which_turn": player["color"],
+                "notes": note,
             },
         )
     return {"message": f"Added game to database", "gameId": game.id}
@@ -249,19 +258,13 @@ def registerLeave(gameBoard, players, leaver):
     for player in players:
         if leaver["cookie"] == player["cookie"] and leaver["color"] == player["color"]:
             wdl = "L"
+            note = "You diconnected from the game"
         else:
             wdl = "W"
+            note = f"{leaver['username']} disconnected from the game"
 
         if player["token"] != -1:
-            pl = (
-                sql_functions.select(
-                    "username, hashed_pass, email, token",
-                    "PLAYERS",
-                    f"token = '{player['token']}'",
-                )
-                .first()
-                .username
-            )
+            pl = checkToken(player["token"]).username
         else:
             pl = "Guest"
 
@@ -272,10 +275,10 @@ def registerLeave(gameBoard, players, leaver):
                 "FKgame": game.id,
                 "WDL": wdl,
                 "which_turn": player["color"],
+                "notes": note,
             },
         )
     return {"message": f"Added game to database", "gameId": game.id}
-    
 
 
 def userExists(usern):
@@ -327,6 +330,9 @@ def getuserData():
             .first()
             .time_date.strftime("%Y-%m-%d %H:%M:%S")
         )
+        notes = sql_functions.select(
+            "notes", "PLAYERS_GAMES", f"id = {game.id} AND FKplayer = '{username}'"
+        ).first().notes
         opponentsIDs = sql_functions.select(
             "FKplayer",
             "PLAYERS_GAMES",
@@ -355,6 +361,7 @@ def getuserData():
                 "board": board,
                 "time": time,
                 "opponents": opponents,
+                "notes": notes,
             }
         )
 

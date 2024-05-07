@@ -167,7 +167,7 @@ def handleMove(data):
         game.changeMode()
 
         data = registerGame(
-            game.getBoardString(), games[gameId][1].players, games[gameId][1].toMove
+            game.getBoardString(), game.players, game.toMove, game.k
         )
         emit(
             "message",
@@ -201,7 +201,7 @@ def handleMove(data):
 
     if game.checkForDraw():
         game.changeMode()
-        data = registerGame(game.getBoardString(), games[gameId][1].players, None)
+        data = registerGame(game.getBoardString(), games[gameId][1].players, None, game.k)
         emit(
             "message",
             {
@@ -279,8 +279,6 @@ def handleLeave():
                 games[userRoom][1].changeState()
 
     userRoom = rooms(request.sid)[0]
-    print("-" * 100)
-    print(userRoom)
     if len(userRoom) != 8:
         userRoom = rooms(request.sid)[1]
 
