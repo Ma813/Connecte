@@ -7,7 +7,8 @@ const PathConstants = {
     PROFILE:"profile",
     VERIFY:"verify/:verifyID",
     FORGOTPASSWORD:"forgot-password",
-    CHANGEPASSWORD:"change-password"
+    CHANGEPASSWORD:"change-password",
+    RESET:"reset/:link"
 }
 
 export default PathConstants
