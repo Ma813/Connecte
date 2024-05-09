@@ -117,7 +117,7 @@ def verify():
         return {"message": f"Thank you for verifying your email {user.username} !"}
 
     except Exception as e:
-        return {"message": str(e)}
+        return {"message": "Server error"}
 
 
 @datab.route("/registerPlayer", methods=["POST"])
@@ -173,7 +173,7 @@ def createPlayer():
 
         return {"message": "Added to database"}
     except Exception as e:
-        return {"message": str(e)}
+        return {"message": "Server error"}
 
 
 def checkToken(token):
@@ -418,69 +418,69 @@ def checkUser():
         sql_functions.update("PLAYERS", {"token": token}, f"username = '{usern}'")
         return {"token": token}
     except Exception as e:
-        return {"message": str(e)}
+        return {"message": "Server error"}
 
 
 @datab.route("/forgotPassword", methods=["POST"])
 def forgotPassword():
     """This method sends a reset password link to the user with a specific email and username.
     The reset password link is used to reset the user's password."""
-    # try:
-    data = request.get_json()
-    username = data["username"]
+    try:
+        data = request.get_json()
+        username = data["username"]
 
-    user = sql_functions.select(
-        "email, verified, username, resetID, validUntil, lastReset",
-        "PLAYERS",
-        f"username = '{username}'",
-    ).first()
-
-    if user is None:
-        return {
-            "message": "If possible, we will send you a reset password link to your email."
-        }
-    if user.verified == 0:
-        return {
-            "message": "If possible, we will send you a reset password link to your email."
-        }
-
-    if (user.validUntil is not None) and (
-        (datetime.datetime.now() - user.validUntil).seconds < 0
-    ):
-        return {
-            "message": "If possible, we will send you a reset password link to your email."
-        }
-    if (
-        user.lastReset is not None
-        and (datetime.datetime.now() - user.lastReset).days < 7
-    ):
-        return {
-            "message": "If possible, we will send you a reset password link to your email."
-        }
-
-    existingResetID = "notNone"
-    while existingResetID is not None:
-        resetID = generateId(50)
-        existingResetID = sql_functions.select(
-            "resetID", "PLAYERS", f"resetID = '{resetID}'"
+        user = sql_functions.select(
+            "email, verified, username, resetID, validUntil, lastReset",
+            "PLAYERS",
+            f"username = '{username}'",
         ).first()
 
-    valid = datetime.datetime.now() + datetime.timedelta(minutes=15)
+        if user is None:
+            return {
+                "message": "If possible, we will send you a reset password link to your email."
+            }
+        if user.verified == 0:
+            return {
+                "message": "If possible, we will send you a reset password link to your email."
+            }
 
-    sql_functions.update(
-        "PLAYERS",
-        {"resetID": resetID, "validUntil": valid},
-        f"username = '{user.username}'",
-    )
+        if (user.validUntil is not None) and (
+            (datetime.datetime.now() - user.validUntil).seconds < 0
+        ):
+            return {
+                "message": "If possible, we will send you a reset password link to your email."
+            }
+        if (
+            user.lastReset is not None
+            and (datetime.datetime.now() - user.lastReset).days < 7
+        ):
+            return {
+                "message": "If possible, we will send you a reset password link to your email."
+            }
 
-    sendResetLink(user.email, resetID, username)
+        existingResetID = "notNone"
+        while existingResetID is not None:
+            resetID = generateId(50)
+            existingResetID = sql_functions.select(
+                "resetID", "PLAYERS", f"resetID = '{resetID}'"
+            ).first()
 
-    return {
-        "message": "If possible, we will send you a reset password link to your email."
-    }
+        valid = datetime.datetime.now() + datetime.timedelta(minutes=15)
 
-    # except Exception as e:
-    #     return {"error": str(e)}
+        sql_functions.update(
+            "PLAYERS",
+            {"resetID": resetID, "validUntil": valid},
+            f"username = '{user.username}'",
+        )
+
+        sendResetLink(user.email, resetID, username)
+
+        return {
+            "message": "If possible, we will send you a reset password link to your email."
+        }
+
+    except Exception as e:
+        return {"error": "Server error"}
 
 
 @datab.route("/resetPassword", methods=["POST"])
@@ -536,7 +536,7 @@ def resetPass():
         return {"message": "Password reset successfully"}
 
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": "Server error"}
 
 
 @datab.route("/validateResetLink", methods=["POST"])
@@ -559,7 +559,7 @@ def validateResetLink():
 
         return {"message": "Reset link valid", "linkValid": True}
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": "Server error"}
 
 
 @datab.route("/changePassword", methods=["POST"])
@@ -624,4 +624,4 @@ def changePass():
         return {"success": "Password changed successfully"}
 
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": "Server error"}

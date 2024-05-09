@@ -53,7 +53,7 @@ const ForgotPassword = () => {
                                     <label className="text-secondary" htmlFor="name">Username</label>
                                     <input type="text" className="form-control" id="name" value={email} onChange={(e) => setEmail(e.target.value)} required />
                                 </div>
-                                <button type="submit" className="btn btn-primary bg-dark">Send new password</button>
+                                <button type="submit" className="btn btn-primary bg-dark">Reset</button>
                             </form>
                         </div>
                     </div>

@@ -1,103 +1,108 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import Cookies from 'universal-cookie';
-import path from '../Path'
-import MiniGameBoard from './MiniGameBoard';
-import PieChart from '../components/PieChart';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import Cookies from "universal-cookie";
+import path from "../Path";
+import MiniGameBoard from "./MiniGameBoard";
+import PieChart from "../components/PieChart";
 import "../styles/ProfilePage.css";
 
-const cookies = new Cookies(null, { path: '/' });
+const cookies = new Cookies(null, { path: "/" });
 
 function getCookie(name) {
-  let cookie = cookies.get(name)
+  let cookie = cookies.get(name);
   if (cookie === undefined) return null;
-  return cookie
-};
+  return cookie;
+}
 
 const ProfilePage = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [winCount, setWinCount] = useState('');
-  const [drawCount, setDrawCount] = useState('');
-  const [loseCount, setLoseCount] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [winCount, setWinCount] = useState("");
+  const [drawCount, setDrawCount] = useState("");
+  const [loseCount, setLoseCount] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [games, setGames] = useState([]);
   const [gameTable, setGameTable] = useState({});
-  const colors = ['red', 'yellow', 'TBD', 'TBD'];
+  const colors = ["red", "yellow", "TBD", "TBD"];
   const [chartData, setChartData] = useState(null);
   const { isAuthenticated } = useAuth(); // Assuming 'user' contains the logged-in user's details
   const navigate = useNavigate();
   const [showingBoard, setShowingBoard] = useState(false);
   const [board, setBoard] = useState(null);
 
-
-
   if (!isAuthenticated) {
     return (
       <div className="container mt-5 text-center">
-        <p className="text-secondary">You must be logged in to view this page.</p>
+        <p className="text-secondary">
+          You must be logged in to view this page.
+        </p>
       </div>
     );
   }
   const handleSubmit = async () => {
     const userData = {
-      token: getCookie('token'),
+      token: getCookie("token"),
     };
-    const response = await fetch(path + '/stats', {
-      method: 'POST',
+    const response = await fetch(path + "/stats", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(userData)
+      body: JSON.stringify(userData),
     });
 
     const responseData = await response.json();
-    const data = responseData.message
+    const data = responseData.message;
     if (data === undefined) return;
-    setEmail(data.email)
-    setUsername(data.username)
-    setWinCount(data.winCount)
-    setDrawCount(data.drawCount)
-    setLoseCount(data.loseCount)
-    setGames(data.games)
+    setEmail(data.email);
+    setUsername(data.username);
+    setWinCount(data.winCount);
+    setDrawCount(data.drawCount);
+    setLoseCount(data.loseCount);
+    setGames(data.games);
     setChartData({
-      labels: ['Wins', 'Draws', 'Losses'],
+      labels: ["Wins", "Draws", "Losses"],
       datasets: [
         {
-          label: 'Games',
+          label: "Games",
           data: [data.winCount, data.drawCount, data.loseCount],
-
-        }
-      ]
+        },
+      ],
     });
-  }
+  };
 
   function convertBoardStringToArray(boardString) {
     if (!boardString) {
-      console.error('Invalid or empty board string:', boardString);
+      console.error("Invalid or empty board string:", boardString);
       return []; // Return an empty array as a fallback
     }
 
     try {
       // Step 1: Remove all periods and trim unnecessary whitespace
-      let cleanedString = boardString.replace(/[\.,]|\./g, ' ').trim();
+      let cleanedString = boardString.replace(/[\.,]|\./g, " ").trim();
 
       let trimedString = cleanedString.substring(1, cleanedString.length - 1);
 
       // Step 2: Split the string into rows by the newline character
-      let rows = trimedString.split('\n').map(row => row.trim());
+      let rows = trimedString.split("\n").map((row) => row.trim());
       // Step 3: Remove the outer brackets and split each row into numbers
-      rows = rows.map(row =>
-        row.slice(1, row.length - 1) // Remove the '[' and ']' from each row
-          .trim()
-          .split(/\s+/) // Split the row by one or more spaces
-          .map(Number) // Convert each element from string tmo number
+      rows = rows.map(
+        (row) =>
+          row
+            .slice(1, row.length - 1) // Remove the '[' and ']' from each row
+            .trim()
+            .split(/\s+/) // Split the row by one or more spaces
+            .map(Number) // Convert each element from string tmo number
       );
 
       return rows;
     } catch (error) {
-      console.error('Error converting board string to array:', boardString, error);
+      console.error(
+        "Error converting board string to array:",
+        boardString,
+        error
+      );
       return [];
     }
   }
@@ -127,34 +132,40 @@ const ProfilePage = () => {
               <td>{game.WDL}</td>
               <td>{game.time}</td>
               <td>
-                <div className="profile-circle" style={{ backgroundColor: colors[game.which_turn - 1] }}></div>
+                <div
+                  className="profile-circle"
+                  style={{ backgroundColor: colors[game.which_turn - 1] }}
+                ></div>
               </td>
               <td>{game.opponents}</td>
               <td>
                 {/* Convert string board to array and render */}
-                <p className='blueLink' onClick={() => handleShowBoard(game.board)}>Show</p>
+                <p
+                  className="blueLink"
+                  onClick={() => handleShowBoard(game.board)}
+                >
+                  Show
+                </p>
                 {/* {game.board ? <MiniGameBoard board={convertBoardStringToArray(game.board)} /> : <p>No board data</p>} */}
               </td>
               <td>{game.notes}</td>
               {console.log(game)}
             </tr>
           ))}
-
         </tbody>
       </table>
     );
-  }
+  };
 
   if (!loaded) {
-    console.log("loading...")
-    handleSubmit()
-    setLoaded(true)
+    console.log("loading...");
+    handleSubmit();
+    setLoaded(true);
   }
 
   const handleChangePass = () => {
-    navigate('/change-password');
-  }
-
+    navigate("/change-password");
+  };
 
   return (
     <div className="container mt-5 text-light p-4 rounded fullW">
@@ -175,27 +186,29 @@ const ProfilePage = () => {
               <tr>
                 <td>{username}</td>
                 <td>{email}</td>
-                <td className='blueLink' onClick={handleChangePass}>Change</td>
+                <td className="blueLink" onClick={handleChangePass}>
+                  Change
+                </td>
               </tr>
             </tbody>
           </table>
-          { games.length === 0 && <p className='h3 m-5'>No games played yet</p>}
-          {games.length > 0 &&
+          {games.length === 0 && <p className="h3 m-5">No games played yet</p>}
+          {games.length > 0 && (
             <div>
-          {chartData && <PieChart chartData={chartData} />}
-          {renderGamesTable(games)}
-          </div>}
+              {chartData && <PieChart chartData={chartData} />}
+              {renderGamesTable(games)}
+            </div>
+          )}
         </div>
       </div>
-      {showingBoard && board &&
+      {showingBoard && board && (
         <div className="game-end-overlay">
           <div className="game-end-content">
             {<MiniGameBoard board={board} />}
             {<button onClick={() => setShowingBoard(false)}>Close</button>}
           </div>
         </div>
-      }
-
+      )}
     </div>
   );
 };
