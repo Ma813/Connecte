@@ -179,8 +179,12 @@ const ProfilePage = () => {
               </tr>
             </tbody>
           </table>
+          { games.length === 0 && <p className='h3 m-5'>No games played yet</p>}
+          {games.length > 0 &&
+            <div>
           {chartData && <PieChart chartData={chartData} />}
           {renderGamesTable(games)}
+          </div>}
         </div>
       </div>
       {showingBoard && board &&

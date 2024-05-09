@@ -10,7 +10,7 @@ from sqlalchemy.sql import text
 import bcrypt
 from flask import request, Blueprint
 from extensions import da
-from mail.mail import sendVerifyLink, sendNewPassword, sendResetLink
+from mail.mail import sendVerifyLink, sendResetLink
 
 datab = Blueprint(name="datab", import_name=__name__)
 pepper = json.load(open("config.json"))
