@@ -6,6 +6,8 @@ import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import Verify from "./pages/Verify";
 import ResetPassword from "./pages/ResetPassword";
+import ChangePassword from "./pages/ChangePassword";
+import ResetPasswordLink from "./pages/ResetPasswordLink";
 
 const routes = [
   { path: "/", element: <CreateRoom /> }, // Updated path for About page
@@ -15,7 +17,9 @@ const routes = [
   { path: "/register", element: <RegisterPage /> }, // Adding RegisterPage to the routes
   { path: "/login", element: <LoginPage /> }, // Adding LoginPage to the routes
   { path: "/verify/:verifyID", element: <Verify />},
-  { path: "/forgot-password", element: <ResetPassword />}
+  { path: "/forgot-password", element: <ResetPassword />},
+  { path: "/change-password", element: <ChangePassword />},
+  { path: "/reset/:link", element: <ResetPasswordLink />}
 ];
 
 export default routes;

@@ -6,7 +6,7 @@ from flask import Blueprint, request, copy_current_request_context
 from flask_socketio import emit, join_room, leave_room, rooms
 from Connect4.connect4 import Connect4
 from extensions import cors, socketio
-from DB.database import registerGame, generateId, checkToken, getName
+from DB.database import registerGame, generateId, checkToken, registerLeave
 from Bot.Connect import connectBotToGame
 
 
@@ -47,10 +47,10 @@ def handleJoin(data):
     gameId = data["gameId"]
     if gameId in games:
         if games[gameId][1].state == 1:
-            for x in games[gameId][1].players:
-                if data["id"] == x[2]:
+            for player in games[gameId][1].players:
+                if data["id"] == player["cookie"]:
                     join_room(gameId)
-                    x[1] = request.sid
+                    player["requestID"] = request.sid
 
                     emit(
                         "message",
@@ -167,7 +167,7 @@ def handleMove(data):
         game.changeMode()
 
         data = registerGame(
-            game.getBoardString(), games[gameId][1].players, games[gameId][1].toMove
+            game.getBoardString(), game.players, game.toMove, game.k
         )
         emit(
             "message",
@@ -201,7 +201,7 @@ def handleMove(data):
 
     if game.checkForDraw():
         game.changeMode()
-        data = registerGame(game.getBoardString(), games[gameId][1].players, None)
+        data = registerGame(game.getBoardString(), games[gameId][1].players, None, game.k)
         emit(
             "message",
             {
@@ -250,21 +250,20 @@ def handleLeave():
     @copy_current_request_context
     def abandonGame(userRoom, id):
         samebrowser = True
-        firstid = games[userRoom][1].players[0][
-            2
-        ]  # if something breaks this will be the culprit
-        for x in games[userRoom][1].players:
+        firstid = (
+            games[userRoom][1].players[0]["cookie"]
+        )  # if something breaks this will DEFINETELY be the culprit
+        for player in games[userRoom][1].players:
 
-            if x[2] != firstid:
-                samebrowser = False
+            if player["cookie"] != firstid:
+                samebrowser = False  # Should be removed in the future
 
         if samebrowser is False:
             time.sleep(15)
-        for x in games[userRoom][1].players:
-            if x[1] == id:
-                data = registerGame(
-                    games[userRoom][1].getBoardString(), games[userRoom][1].players, x
-                )
+        game = games[userRoom][1]
+        for player in game.players:
+            if player["requestID"] == id:
+                data = registerLeave(game.getBoardString(), game.players, player)
                 emit(
                     "message",
                     {
@@ -286,8 +285,8 @@ def handleLeave():
     if userRoom not in games:
         return
 
-    for x in games[userRoom][1].players:
-        if x[1] == request.sid:
+    for player in games[userRoom][1].players:
+        if player["requestID"] == request.sid:
             thread = Thread(target=abandonGame, args=(userRoom, request.sid))
             thread.start()
 

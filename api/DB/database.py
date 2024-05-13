@@ -10,7 +10,7 @@ from sqlalchemy.sql import text
 import bcrypt
 from flask import request, Blueprint
 from extensions import da
-from mail.mail import sendVerifyLink, sendNewPassword
+from mail.mail import sendVerifyLink, sendResetLink
 
 datab = Blueprint(name="datab", import_name=__name__)
 pepper = json.load(open("config.json"))
@@ -44,6 +44,15 @@ class SqlFunctions:
         self.database.session.execute(query)
         self.database.session.commit()
 
+    def nullify(self, table, fields, condition):
+        """This method sets specified fields to null in the database."""
+        clause = ", ".join(
+            [f"{key} = NULL" for key in fields]
+        )
+        query = text(f"UPDATE connecte.{table} SET {clause} WHERE {condition}")
+        self.database.session.execute(query)
+        self.database.session.commit()
+
 
 sql_functions = SqlFunctions(da)
 
@@ -57,6 +66,10 @@ class Players(da.Model):
     hashed_pass = da.Column(da.String(255))
     email = da.Column(da.String(255))
     verified = da.Column(da.Integer)
+    lastChange = da.Column(da.DateTime)
+    lastReset = da.Column(da.DateTime)
+    resetID = da.Column(da.String(50))
+    validUntil = da.Column(da.DateTime)
 
 
 class Games(da.Model):
@@ -77,6 +90,7 @@ class PlayersGames(da.Model):
     FKgame = da.Column(da.Integer, da.ForeignKey("games.id"))
     WDL = da.Column(da.String(1))
     which_turn = da.Column(da.Integer)
+    notes = da.Column(da.String(100))
 
 
 def generateId(lenght, prefix=""):
@@ -103,7 +117,7 @@ def verify():
         return {"message": f"Thank you for verifying your email {user.username} !"}
 
     except Exception as e:
-        return {"message": str(e)}
+        return {"message": "Server error"}
 
 
 @datab.route("/registerPlayer", methods=["POST"])
@@ -159,7 +173,7 @@ def createPlayer():
 
         return {"message": "Added to database"}
     except Exception as e:
-        return {"message": str(e)}
+        return {"message": "Server error"}
 
 
 def checkToken(token):
@@ -180,7 +194,7 @@ def getName(token):
     return "Guest"
 
 
-def registerGame(gameBoard, players, winner):
+def registerGame(gameBoard, players, winner, tiles):
     """This method registers a game and its data into the database."""
     now = datetime.datetime.now()
     time = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -198,26 +212,33 @@ def registerGame(gameBoard, players, winner):
             "requestID": -1,
             "cookie": -1,
             "token": -1,
+            "username": "name",
         }
+    else:
+        sql_functions.insert(
+            "PLAYERS_GAMES",
+            {
+                "FKplayer": winner["username"],
+                "FKgame": game.id,
+                "WDL": "W",
+                "which_turn": winner["color"],
+                "notes": f"Connected {tiles} in a row to win!",
+            },
+        )
 
     for player in players:
+        note = ""
         if winner["cookie"] == player["cookie"] and winner["color"] == player["color"]:
-            wdl = "W"
+            continue
         elif draw:
+            note = f"No one connected {tiles} in a row! It is a draw!"
             wdl = "D"
         else:
+            note = f"{winner['username']} connected {tiles} in a row to win!"
             wdl = "L"
 
         if player["token"] != -1:
-            pl = (
-                sql_functions.select(
-                    "username, hashed_pass, email, token",
-                    "PLAYERS",
-                    f"token = '{player['token']}'",
-                )
-                .first()
-                .username
-            )
+            pl = checkToken(player["token"]).username
         else:
             pl = "Guest"
 
@@ -228,6 +249,44 @@ def registerGame(gameBoard, players, winner):
                 "FKgame": game.id,
                 "WDL": wdl,
                 "which_turn": player["color"],
+                "notes": note,
+            },
+        )
+    return {"message": f"Added game to database", "gameId": game.id}
+
+
+def registerLeave(gameBoard, players, leaver):
+    """This method registers a player leaving the game into the database.
+    It registers the game as a loss for the player who left
+    and as a win for the other player."""
+    now = datetime.datetime.now()
+    time = now.strftime("%Y-%m-%d %H:%M:%S")
+    sql_functions.insert("GAMES", {"game_board": gameBoard, "time_date": time})
+    game = sql_functions.select("*", "GAMES", f"time_date = '{time}'").first()
+
+    da.session.commit()
+
+    for player in players:
+        if leaver["cookie"] == player["cookie"] and leaver["color"] == player["color"]:
+            wdl = "L"
+            note = "You diconnected from the game"
+        else:
+            wdl = "W"
+            note = f"{leaver['username']} disconnected from the game"
+
+        if player["token"] != -1:
+            pl = checkToken(player["token"]).username
+        else:
+            pl = "Guest"
+
+        sql_functions.insert(
+            "PLAYERS_GAMES",
+            {
+                "FKplayer": pl,
+                "FKgame": game.id,
+                "WDL": wdl,
+                "which_turn": player["color"],
+                "notes": note,
             },
         )
     return {"message": f"Added game to database", "gameId": game.id}
@@ -282,6 +341,13 @@ def getuserData():
             .first()
             .time_date.strftime("%Y-%m-%d %H:%M:%S")
         )
+        notes = (
+            sql_functions.select(
+                "notes", "PLAYERS_GAMES", f"id = {game.id} AND FKplayer = '{username}'"
+            )
+            .first()
+            .notes
+        )
         opponentsIDs = sql_functions.select(
             "FKplayer",
             "PLAYERS_GAMES",
@@ -310,6 +376,7 @@ def getuserData():
                 "board": board,
                 "time": time,
                 "opponents": opponents,
+                "notes": notes,
             }
         )
 
@@ -351,33 +418,101 @@ def checkUser():
         sql_functions.update("PLAYERS", {"token": token}, f"username = '{usern}'")
         return {"token": token}
     except Exception as e:
-        return {"message": str(e)}
+        return {"message": "Server error"}
 
 
-@datab.route("/resetPassword", methods=["POST"])
-def resetPass():
-    """This method finds username specified in the request,
-    checks if that user is verified.
-    If user is verified, a new password is sent to their email.
-    If not, an error message is sent to the client"""
+@datab.route("/forgotPassword", methods=["POST"])
+def forgotPassword():
+    """This method sends a reset password link to the user with a specific email and username.
+    The reset password link is used to reset the user's password."""
     try:
         data = request.get_json()
         username = data["username"]
 
         user = sql_functions.select(
-            "email, verified, username", "PLAYERS", f"username = '{username}'"
+            "email, verified, username, resetID, validUntil, lastReset",
+            "PLAYERS",
+            f"username = '{username}'",
         ).first()
 
         if user is None:
-            return {"error": "Username doesn't exist"}
+            return {
+                "message": "If possible, we will send you a reset password link to your email."
+            }
+        if user.verified == 0:
+            return {
+                "message": "If possible, we will send you a reset password link to your email."
+            }
+
+        if (user.validUntil is not None) and (
+            (datetime.datetime.now() - user.validUntil).seconds < 0
+        ):
+            return {
+                "message": "If possible, we will send you a reset password link to your email."
+            }
+        if (
+            user.lastReset is not None
+            and (datetime.datetime.now() - user.lastReset).days < 7
+        ):
+            return {
+                "message": "If possible, we will send you a reset password link to your email."
+            }
+
+        existingResetID = "notNone"
+        while existingResetID is not None:
+            resetID = generateId(50)
+            existingResetID = sql_functions.select(
+                "resetID", "PLAYERS", f"resetID = '{resetID}'"
+            ).first()
+
+        valid = datetime.datetime.now() + datetime.timedelta(minutes=15)
+
+        sql_functions.update(
+            "PLAYERS",
+            {"resetID": resetID, "validUntil": valid},
+            f"username = '{user.username}'",
+        )
+
+        sendResetLink(user.email, resetID, username)
+
+        return {
+            "message": "If possible, we will send you a reset password link to your email."
+        }
+
+    except Exception as e:
+        return {"error": "Server error"}
+
+
+@datab.route("/resetPassword", methods=["POST"])
+def resetPass():
+    """This method finds user with specifit reset ID in the request,
+    checks if that user is verified and their reset link is valid.
+    If user is verified and the reset link is valid, the password of
+    the user is changed to a new password specified in the request."""
+
+    try:
+        data = request.get_json()
+        link = data["link"]
+        newPass = data["password"]
+
+        user = sql_functions.select(
+            "email, verified, username, resetID, validUntil",
+            "PLAYERS",
+            f"resetID = '{link}'",
+        ).first()
+
+        if user is None:
+            return {"error": "Reset link invalid or expired"}
         if user.verified == 0:
             return {"error": "User needs to be verified to reset password"}
-
-        newPassword = generateId(10)
+        if datetime.datetime.now() > user.validUntil:
+            return {"error": "Reset link invalid or expired"}
+        if len(newPass) < 8:
+            return {"error": "Password must be at least 8 characters long"}
 
         passw = hmac.new(
             pepper["Pepper"].encode("utf-8"),
-            newPassword.encode("utf-8"),
+            newPass.encode("utf-8"),
             hashlib.sha256,
         ).hexdigest()
         salt = bcrypt.gensalt()
@@ -387,9 +522,106 @@ def resetPass():
         sql_functions.update(
             "PLAYERS", {"hashed_pass": passw}, f"username = '{user.username}'"
         )
-        sendNewPassword(user.email, newPassword, user.username)
+        sql_functions.update(
+            "PLAYERS",
+            {"lastReset": datetime.datetime.now()},
+            f"username = '{user.username}'",
+        )
+        sql_functions.nullify(
+            "PLAYERS",
+            ["resetID", "validUntil"],
+            f"username = '{user.username}'"
+        )
 
-        return {"message": "Password reset email sent"}
+        return {"message": "Password reset successfully"}
 
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": "Server error"}
+
+
+@datab.route("/validateResetLink", methods=["POST"])
+def validateResetLink():
+    """This method validates the reset password link by checking the resetID in the request.
+    If reset ID is valid, the user is redirected to the reset password page.
+    If not, an error message is sent to the client."""
+    try:
+        data = request.get_json()
+        id = data["link"]
+        user = sql_functions.select(
+            "username, hashed_pass, email, token, validUntil",
+            "PLAYERS",
+            f"resetID = '{id}'",
+        ).first()
+        if user is None:
+            return {"error": "Reset link invalid or expired", "linkValid": False}
+        if (datetime.datetime.now() - user.validUntil).seconds < 0:
+            return {"error": "Reset link invalid or expired", "linkValid": False}
+
+        return {"message": "Reset link valid", "linkValid": True}
+    except Exception as e:
+        return {"error": "Server error"}
+
+
+@datab.route("/changePassword", methods=["POST"])
+def changePass():
+    """This method changes the password of the user specified in the request."""
+    try:
+        data = request.get_json()
+        token = data["token"]
+        oldPass = data["oldPassword"]
+        newPass = data["newPassword"]
+
+        if checkToken(token) is None:
+            return {"error": "Authentication failure, please log in again"}
+
+        if oldPass == newPass:
+            return {"error": "Old and new password cannot be the same"}
+
+        if len(newPass) < 8:
+            return {"error": "Password must be at least 8 characters long"}
+
+        username = checkToken(token).username
+        user = sql_functions.select(
+            "username, hashed_pass, email, token, lastChange",
+            "PLAYERS",
+            f"username = '{username}'",
+        ).first()
+
+        if not bcrypt.checkpw(
+            hmac.new(
+                pepper["Pepper"].encode("utf-8"),
+                oldPass.encode("utf-8"),
+                hashlib.sha256,
+            )
+            .hexdigest()
+            .encode("utf-8"),
+            str.encode(user.hashed_pass, "utf-8"),
+        ):
+            return {"error": "Incorrect password"}
+
+        if user.lastChange is not None:
+            delta = datetime.datetime.now() - user.lastChange
+            deltaHours = delta.days * 24 + delta.seconds / 3600
+            if deltaHours < 12:
+                return {"error": "Password can only be changed once every 12 hours"}
+
+        passw = hmac.new(
+            pepper["Pepper"].encode("utf-8"), newPass.encode("utf-8"), hashlib.sha256
+        ).hexdigest()
+        salt = bcrypt.gensalt()
+        passw = bcrypt.hashpw(passw.encode("utf-8"), salt)
+        passw = passw.decode("utf-8")
+
+        sql_functions.update(
+            "PLAYERS", {"hashed_pass": passw}, f"username = '{username}'"
+        )
+
+        sql_functions.update(
+            "PLAYERS",
+            {"lastChange": datetime.datetime.now()},
+            f"username = '{username}'",
+        )
+        return {"success": "Password changed successfully"}
+
+    except Exception as e:
+        return {"error": "Server error"}
