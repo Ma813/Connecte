@@ -21,20 +21,25 @@ def getRoom():
     """This method is responsible for creating a new game room"""
     data = request.get_json()
     gameId = generateId(8)
-    if data["mode"] == 2:
-        games[gameId] = [time.time(), Connect4(gameMode=2)]
+
+    if 1 > data["mode"] or data["mode"] > 3 or data["mode"] is None:
+        data["mode"] = 1
+    if 2 > data["w"] or data["w"] > 15 or data["w"] is None:
+        data["w"] = 7
+    if 2 > data["h"] or data["h"] > 15 or data["h"] is None:
+        data["h"] = 6
+    if 2 > data["playerCount"] or data["playerCount"] > 4 or data["playerCount"] is None:
+        data["playerCount"] = 2
+    if 2 > data["winCondition"] or data["winCondition"] is None:
+        data["winCondition"] = 4
+
+    if data["mode"] != 3:
+        games[gameId] = [time.time(), Connect4(gameMode=data["mode"], w=data["w"], h=data["h"], playerCount=data["playerCount"],
+                                               k=data["winCondition"])]
     elif data["mode"] == 3:
         game = Connect4()
         games[gameId] = [time.time(), game]
         connectBotToGame(gameId, 7)
-    elif data["winCondition"] >= 1:
-        games[gameId] = [
-            time.time(),
-            Connect4(k=data["winCondition"], playerCount=data["playerCount"]),
-        ]
-    else:
-        games[gameId] = [time.time(), Connect4(playerCount=data["playerCount"])]
-
     return {"gameId": gameId}
 
 
