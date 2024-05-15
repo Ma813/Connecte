@@ -37,7 +37,7 @@ class Connect4:
     def getBoardString(self):
         """Get the game's board as a string"""
         if self.gameMode == 1:
-            return np.array2string(self.board, separator=",")
+            return str(self.h)+str(self.w)+np.array2string(self.board, separator=",")
         else:
             return np.array2string(self.singleColor(), separator=",")
 

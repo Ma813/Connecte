@@ -24,7 +24,7 @@ def createConnection(link,algorithim,sio):
         if(event[0] == 'message'):
             if(event[1]['state'] == 'playing_game'):
                 if(event[1]["move"]):
-                    game = algorithim.setUpGame(int(event[1]["color"]),eval('np.array(' + event[1]["board"] + ')'))
+                    game = algorithim.setUpGame(int(event[1]["color"]),eval('np.array(' + event[1]["board"][2:] + ')'))
                     sio.emit('move',{'gameId': link, 'move': algorithim.CalculateMove(game)})
                   
                     continue
