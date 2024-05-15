@@ -209,10 +209,8 @@ def handleMove(data):
             },
             room=games[gameId][1].toMove["requestID"],
         )
-        game.printMode()
 
         game.changeState()
-        game.printMode()
         return
 
     if game.checkForDraw():

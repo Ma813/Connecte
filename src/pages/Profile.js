@@ -73,9 +73,8 @@ const ProfilePage = () => {
   };
 
   function convertBoardStringToArray(boardString) {
-    if (!boardString) {
-      console.error("Invalid or empty board string:", boardString);
-      return []; // Return an empty array as a fallback
+    if (!isNaN(boardString[0])) {
+      boardString = boardString.slice(2);
     }
 
     try {
