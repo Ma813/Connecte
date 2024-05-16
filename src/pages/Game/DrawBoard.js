@@ -16,12 +16,18 @@ const colors = {
 
 
 
-const DrawBoard = ({ board, boardString, move, color, MakeMove, error, gameEnd,spectator,name }) => {
-    console.log(spectator)
+const DrawBoard = ({ board2, boardString, move, color, MakeMove, error, gameEnd,spectator,name }) => {
+    console.log(boardString[0])
+    let board = new Array(Number(boardString[0])).fill(null)
+    .map(i => new Array(Number(boardString[1])).fill(null));
+    
+    boardString = boardString.slice(2);
+  
     const reversedString = () => {
         return '[' + boardString.match(/\[([^[\]]*)\]/g).reverse().join(',') + ']';
     }
 
+    console.log(board.length)
     const cleanedString = () => {
         return reversedString().replace(/[^0-9]/g, '');
     }

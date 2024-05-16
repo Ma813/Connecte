@@ -36,10 +36,21 @@ def getRoom():
     if data["mode"] != 3:
         games[gameId] = [time.time(), Connect4(gameMode=data["mode"], w=data["w"], h=data["h"], playerCount=data["playerCount"],
                                                k=data["winCondition"])]
+
     elif data["mode"] == 3:
         game = Connect4()
+        difficulty = 2
+        if(data["botDifficulty"] == 1):
+            difficulty = 2
+        if(data["botDifficulty"] == 2):
+            difficulty = 4
+        if(data["botDifficulty"] == 3):
+            difficulty = 6
+        if(data["botDifficulty"] == 4):
+            difficulty = 7
+        print(difficulty)
         games[gameId] = [time.time(), game]
-        connectBotToGame(gameId, 7)
+        connectBotToGame(gameId, difficulty)
     return {"gameId": gameId}
 
 
@@ -198,10 +209,8 @@ def handleMove(data):
             },
             room=games[gameId][1].toMove["requestID"],
         )
-        game.printMode()
 
         game.changeState()
-        game.printMode()
         return
 
     if game.checkForDraw():

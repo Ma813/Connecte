@@ -68,8 +68,8 @@ const GameRoom = () => {
             playerCount: playerCondition,
             w: width,
             h: heigth,
-            winCondition: winCondition
-
+            winCondition: winCondition,
+            botDifficulty: botDifficulty
         };
 
 
@@ -114,6 +114,7 @@ const GameRoom = () => {
     if (Loading) {
         return renderLoading
     }
+
     else {
         return (
             <div className='CreateRoomPage'>
@@ -145,14 +146,15 @@ const GameRoom = () => {
                                     id="botDifficultySlider"
                                     type="range"
                                     min="1"
-                                    max="10"
+                                    max="4"
                                     value={botDifficulty}
                                     onChange={(e) => setBotDifficulty(parseInt(e.target.value, 10))}
                                     style={{ width: "300px" }} // Optional style to improve visibility
                                 />
                                 <div className="sliderValue">
-                                    {botDifficulty} / 10
+                                    {botDifficulty} / 4
                                 </div>
+
                             </div>
                         )}
                     </div>
