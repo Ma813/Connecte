@@ -5,6 +5,46 @@
     text-align:center;
     font-weight: bold;
 }
+.button-6 {
+  align-items: center;
+  background-color: #e9e0d4;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: .25rem;
+  box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+  box-sizing: border-box;
+  color: rgba(0, 0, 0, 0.85);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.25;
+  padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+  position: relative;
+  transition: all 250ms;
+  touch-action: manipulation;
+  vertical-align: baseline;
+  width: auto;
+}
+
+.button-6:hover,
+.button-6:focus {
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.button-6:hover {
+  background-color: #F0F0F1;
+}
+
+.button-6:active {
+  background-color: #F0F0F1;
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px;
+  color: rgba(0, 0, 0, 0.65);
+}
 
 .copyButton{
     width:45%
@@ -15,17 +55,101 @@
 }
 
 .select{
-    font-size:x-large;
+    font-size:medium;
+    padding: 5px;
     
 }
 
 input[type='radio'] { 
-    transform: scale(2); 
+    transform: scale(1.5); 
     margin: 20px;
 }
+
+.checkbox {
+    text-align:center;
+  }
+  
+  .checkbox input{
+    margin: 0px 0px 0px 0px;
+  }
+  
+  .checkbox label{
+    margin:  20px;
+    font-size: x-large;
+    
+  }
 
 /*used for notifying the user that the input field is empty */
 .errorMessage::placeholder{
     color:rgba(255, 0, 0, 0.7);;
+}
+.countdown {
+    font-size: 2em;
+    align-items: center;
+    color: white;
+    font-size: 30px;
+    height: 70px;
+    width: 350px;
+}
+
+.RedCountdown {
+    font-size: 2em;
+    align-items: center;
+    font-size: 30px;
+    height: 70px;
+    width: 350px;
+    color: red; 
+}
+
+label{
+    font-size: 20px;
+    padding-right: 20px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+.hoverLabel:hover + .hover-text{
+    display:block;
+    color:#ff8a22;
+    padding: 3px;
+}
+
+.hover-text{
+    display: none;
+
+    
+    /* Initially hidden */
+}
+
+.question-mark{
+    margin: 5px;
+    font-size: 25px;
+}
+.numberInput{
+    max-width: 75px;
+    font-size: 16px;
+    font-size: Max(16px, 1em);
+    font-family: inherit;
+    padding: 0.25em 0.5em;
+    background-color: #e9e0d4;
+    border: 2px solid var(--input-border);
+    border-radius: 4px;
+    transition: 180ms box-shadow ease-in-out;
+}
+.textInput{
+    max-width: 600px;
+    max-height: 200px;
+    font-size: 15px;
+    font-size: Max(20px, 1em);
+    font-family: inherit;
+    padding: 0.25em 0.5em;
+    background-color: #e9e0d4;
+    border: 2px solid var(--input-border);
+    border-radius: 4px;
+    transition: 180ms box-shadow ease-in-out;
+}
+.CreateRoomPage{
+    background: linear-gradient(0.5turn, #bee1cf, #39416d);
+
 }
 
