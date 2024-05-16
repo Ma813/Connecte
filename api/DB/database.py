@@ -450,13 +450,13 @@ def forgotPassword():
             return {
                 "message": "If possible, we will send you a reset password link to your email."
             }
-        if (
-            user.lastReset is not None
-            and (datetime.datetime.now() - user.lastReset).days < 7
-        ):
-            return {
-                "message": "If possible, we will send you a reset password link to your email."
-            }
+        # if (
+        #     user.lastReset is not None
+        #     and (datetime.datetime.now() - user.lastReset).days < 7
+        # ):
+        #     return {
+        #         "message": "If possible, we will send you a reset password link to your email."
+        #     }
 
         existingResetID = "notNone"
         while existingResetID is not None:
