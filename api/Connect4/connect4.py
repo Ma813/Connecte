@@ -39,7 +39,7 @@ class Connect4:
         if self.gameMode == 1:
             return str(self.h)+str(self.w)+np.array2string(self.board, separator=",")
         else:
-            return np.array2string(self.singleColor(), separator=",")
+            return str(self.h)+str(self.w)+np.array2string(self.singleColor(), separator=",")
 
     def singleColor(self):
         """Get the game's board as a string with only one color for every token on the board"""
