@@ -19,9 +19,11 @@ room = Blueprint(name="room", import_name=__name__)
 def getRoom():
     # for future, data['w'] is width and data['h'] is heigth
     """This method is responsible for creating a new game room"""
-    data = request.get_json()
-    gameId = generateId(8)
 
+    data = request.get_json()
+
+    gameId = generateId(8)
+    
     if 1 > data["mode"] or data["mode"] > 3 or data["mode"] is None:
         data["mode"] = 1
     if 2 > data["w"] or data["w"] > 15 or data["w"] is None:
@@ -156,10 +158,33 @@ def handleJoin(data):
 
 @socketio.on("move")
 def handleMove(data):
-    """This method is responsible for handling the move event for the game room"""
     try:
+        
         gameId = data["gameId"]
         game = games[gameId][1]
+        if(request.sid != game.toMove["requestID"]):
+            emit(
+                    "message",
+                    {
+                        "state": "playing_game",
+                        "board": games[gameId][1].getBoardString(),
+                        "move": False,
+                        "color": games[gameId][1].toMove["color"],
+                        "name": games[gameId][1].toMove["username"],
+                    },
+                    room=gameId,
+                )
+            emit(
+                    "message",
+                    {
+                        "state": "playing_game",
+                        "board": games[gameId][1].getBoardString(),
+                        "move": True,
+                        "color": games[gameId][1].toMove["color"],
+                        "name": games[gameId][1].toMove["username"],
+                    },
+                    room=games[gameId][1].toMove["requestID"],
+                )
         move = int(data["move"])
         game.placeTile(move)
 
