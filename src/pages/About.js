@@ -43,7 +43,7 @@ export default function About() {
             <p><strong>2. Can I join a game if I don’t know anyone?</strong></p>
             <p>No, public rooms feature is not available yet.</p>
     
-            <p><strong>3. What is the goal of Connect4?</strong></p>
+            <p><strong>3. What is the goal of Connectė?</strong></p>
             <p>The goal is to connect four of your discs in a row either horizontally, vertically, or diagonally before your opponent does.</p>
     
             <p><strong>4. Are there different game modes available?</strong></p>
@@ -73,12 +73,12 @@ export default function About() {
     const gameRulesContent = (
         <div>
             <h2>Game Rules</h2>
-            <p>Connect4 is played by two players who take turns dropping colored discs into a vertically suspended grid. The objective is to be the first to form a horizontal, vertical, or diagonal line of four of one's own discs.</p>
+            <p>Connectė is played by two players who take turns dropping colored discs into a vertically suspended grid. The objective is to be the first to form a horizontal, vertical, or diagonal line of four of one's own discs.</p>
             <p><strong>Create room:</strong> Starts a new game room where other players can join. Only the creator can set game parameters.</p>
             <p><strong>Input room ID:</strong> Enter the ID of an existing game room you wish to join. This ID is provided by the game room creator.</p>
             <p><strong>Join game room:</strong> After entering a valid room ID, this button connects you to the specified game room.</p>
             <h3>Game Options</h3>
-            <p><strong>Standard game:</strong> Play the classic version of Connect4 without any modifications.</p>
+            <p><strong>Standard game:</strong> Play the classic version of Connectė without any modifications.</p>
             <p><strong>Number of players:</strong> Select how many players will be in the game.</p>
             <p><strong>Memory Game:</strong> In this mode, each player must remember the colors of discs that are hidden after being placed.</p>
             <p><strong>Bot Game:</strong> Play against a computer-controlled opponent.</p>
@@ -105,7 +105,7 @@ export default function About() {
     return (
         <div>
             <h1>Connectė</h1>
-            <p>Connectė is an implementation of the game Connect4 using React and Python flask. In the game, you can play against other opponents or a bot that utilizes the alpha-beta pruning algorithm to select the moves that lead to the best outcome. The website also implements multiple game modes that would be impossible to play on a physical board.</p>
+            <p>Connectė is an implementation of the game Connectė using React and Python flask. In the game, you can play against other opponents or a bot that utilizes the alpha-beta pruning algorithm to select the moves that lead to the best outcome. The website also implements multiple game modes that would be impossible to play on a physical board.</p>
             
             <button style={{ marginRight: '10px' }} className="btn btn-secondary" onClick={() => setContent('gameRules')}>Game Rules</button>
 
